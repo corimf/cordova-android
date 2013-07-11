@@ -21,9 +21,7 @@ package org.apache.cordova;
 
 import java.io.IOException;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.Locale;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -43,8 +41,7 @@ public class Config {
 
     public static final String TAG = "Config";
 
-    private ArrayList<Pattern> whiteList = new ArrayList<Pattern>();
-    private HashMap<String, Boolean> whiteListCache = new HashMap<String, Boolean>();
+    private Whitelist whitelist = new Whitelist();
     private String startUrl;
 
     private static Config self = null;
@@ -92,7 +89,7 @@ public class Config {
                     String origin = xml.getAttributeValue(null, "origin");
                     String subdomains = xml.getAttributeValue(null, "subdomains");
                     if (origin != null) {
-                        this._addWhiteListEntry(origin, (subdomains != null) && (subdomains.compareToIgnoreCase("true") == 0));
+                        whitelist.addWhiteListEntry(origin, (subdomains != null) && (subdomains.compareToIgnoreCase("true") == 0));
                     }
                 }
                 else if (strNode.equals("log")) {
@@ -206,41 +203,7 @@ public class Config {
         if (self == null) {
             return;
         }
-
-        self._addWhiteListEntry(origin, subdomains);
-    }
-
-
-    private void _addWhiteListEntry(String origin, boolean subdomains) {
-        try {
-            // Unlimited access to network resources
-            if (origin.compareTo("*") == 0) {
-                LOG.d(TAG, "Unlimited access to network resources");
-                this.whiteList.add(Pattern.compile(".*"));
-            } else { // specific access
-                // check if subdomains should be included
-                // TODO: we should not add more domains if * has already been added
-                if (subdomains) {
-                    // XXX making it stupid friendly for people who forget to include protocol/SSL
-                    if (origin.startsWith("http")) {
-                        this.whiteList.add(Pattern.compile(origin.replaceFirst("https?://", "^https?://(.*\\.)?")));
-                    } else {
-                        this.whiteList.add(Pattern.compile("^https?://(.*\\.)?" + origin));
-                    }
-                    LOG.d(TAG, "Origin to allow with subdomains: %s", origin);
-                } else {
-                    // XXX making it stupid friendly for people who forget to include protocol/SSL
-                    if (origin.startsWith("http")) {
-                        this.whiteList.add(Pattern.compile(origin.replaceFirst("https?://", "^https?://")));
-                    } else {
-                        this.whiteList.add(Pattern.compile("^https?://" + origin));
-                    }
-                    LOG.d(TAG, "Origin to allow: %s", origin);
-                }
-            }
-        } catch (Exception e) {
-            LOG.d(TAG, "Failed to add origin %s", origin);
-        }
+        self.whitelist.addWhiteListEntry(origin, subdomains);
     }
 
     /**
@@ -253,25 +216,7 @@ public class Config {
         if (self == null) {
             return false;
         }
-
-        // Check to see if we have matched url previously
-        if (self.whiteListCache.get(url) != null) {
-            return true;
-        }
-
-        // Look for match in white list
-        Iterator<Pattern> pit = self.whiteList.iterator();
-        while (pit.hasNext()) {
-            Pattern p = pit.next();
-            Matcher m = p.matcher(url);
-
-            // If match found, then cache it to speed up subsequent comparisons
-            if (m.find()) {
-                self.whiteListCache.put(url, true);
-                return true;
-            }
-        }
-        return false;
+        return self.whitelist.isUrlWhiteListed(url);
     }
 
     public static String getStartUrl() {
