@@ -1,3 +1,15 @@
+Fix Splashscreen Integer Value
+- Cordova RTC work item number: 85275
+- Apache Cordova Jira issue: https://issues.apache.org/jira/browse/CB-3819 
+and parts of commit 705991e5b037743e632934b3c6ee98976e18d3f8
+- Markmail or Google Group reference:
+- Product PMR: APAR PI46986 (RTC 85275)
+- Full description: Documenation for setting a splashscreen through the 
+config.xml using the <preference> tag with attributes name and value shows 
+that name should be "SplashScreen" and value should be the name of the png 
+file. The code to handle this expects value to be an integer instead. The 
+fix is to check for string instead of integer. 
+
 Fix Filereader returning FileNotFoundException
 - Cordova RTC work item number: 81748
 - Apache Cordova Jira issue: 

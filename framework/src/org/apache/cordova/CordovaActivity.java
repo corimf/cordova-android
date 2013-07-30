@@ -357,16 +357,14 @@ public class CordovaActivity extends Activity implements CordovaInterface {
      * @param url
      */
     public void loadUrl(String url) {
-
-        // Init web view if not already done
-        if (this.appView == null) {
-            this.init();
+        if (appView == null) {
+            init();
         }
-
         this.splashscreenTime = preferences.getInteger("SplashScreenDelay", this.splashscreenTime);
-        if(this.splashscreenTime > 0)
+        String splash = preferences.getString("SplashScreen", null);
+        if(this.splashscreenTime > 0 && splash != null)
         {
-            this.splashscreen = preferences.getInteger("SplashScreen", 0);
+            this.splashscreen = getResources().getIdentifier(splash, "drawable", getClass().getPackage().getName());;
             if(this.splashscreen != 0)
             {
                 this.showSplashScreen(this.splashscreenTime);
@@ -386,6 +384,7 @@ public class CordovaActivity extends Activity implements CordovaInterface {
             // Then load the spinner
             this.loadSpinner();
         }
+
         //Load the correct splashscreen
         
         if(this.splashscreen != 0)
@@ -983,7 +982,10 @@ public class CordovaActivity extends Activity implements CordovaInterface {
             else {
                 // If the splash dialog is showing don't try to show it again
                 if (this.splashDialog == null || !this.splashDialog.isShowing()) {
-                    this.splashscreen = preferences.getInteger("SplashScreen", 0);
+                    String splashResource = preferences.getString("SplashScreen", null);
+                    if (splashResource != null) {
+                        splashscreen = getResources().getIdentifier(splashResource, "drawable", getClass().getPackage().getName());
+                    }
                     this.showSplashScreen(this.splashscreenTime);
                 }
             }
