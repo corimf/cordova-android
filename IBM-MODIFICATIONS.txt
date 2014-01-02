@@ -1,0 +1,12 @@
+webview methods need to be run on UI thread starting in Android 4.3
+
+- RTC work item number: 31733
+- Apache Cordova Jira issue: https://issues.apache.org/jira/browse/CB-4858
+- Markmail or Google Group reference: none
+- Product PMR: none
+- Description: backport CB-4858 to this branch. Without it, starting in Android
+  4.3 the InAppBrowser may fail to open, and calls to window.open for the 
+  InAppBrowser would throw a Java exception. Also found an issue where using
+  a declared feature on window.open besides "location" would cause a
+  NullPointerException. Also fixed the project.properties file to remove the
+  reference to Google APIs and just use Android APIs.

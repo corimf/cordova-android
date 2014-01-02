@@ -1,6 +1,6 @@
-// commit 4082ee0ba3a8902cba7bd087d0584bb7534e694b
+// commit bcd8d3a631c0a3bc3559d41bcb95f2c032176905
 
-// File generated at :: Wed Jan 02 2013 16:43:38 GMT-0800 (PST)
+// File generated at :: Thu Jan 02 2014 17:21:56 GMT-0500 (EST)
 
 /*
  Licensed to the Apache Software Foundation (ASF) under one
@@ -3322,6 +3322,7 @@ module.exports = GlobalizationError;
 define("cordova/plugin/InAppBrowser", function(require, exports, module) {
 
 var exec = require('cordova/exec');
+var urlutil = require('cordova/urlutil');
 
 function InAppBrowser()
 {
@@ -3342,6 +3343,7 @@ InAppBrowser.prototype._eventHandler = function(event)
 
 InAppBrowser.open = function(strUrl, strWindowName, strWindowFeatures)
 {
+    strUrl = urlutil.makeAbsolute(strUrl);
     var iab = new InAppBrowser();
     var cb = function(eventname) {
        iab._eventHandler(eventname);
@@ -6163,6 +6165,23 @@ var splashscreen = {
 };
 
 module.exports = splashscreen;
+
+});
+
+// file: lib/common/urlutil.js
+define("cordova/urlutil", function(require, exports, module) {
+
+var urlutil = exports;
+var anchorEl = document.createElement('a');
+
+/**
+ * For already absolute URLs, returns what is passed in.
+ * For relative URLs, converts them to absolute ones.
+ */
+urlutil.makeAbsolute = function(url) {
+  anchorEl.href = url;
+  return anchorEl.href;
+};
 
 });
 

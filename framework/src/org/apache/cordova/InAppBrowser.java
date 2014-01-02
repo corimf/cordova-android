@@ -82,47 +82,59 @@ public class InAppBrowser extends CordovaPlugin {
      * @param callbackId    The callback id used when calling back into JavaScript.
      * @return              A PluginResult object with a status and message.
      */
-    public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
+    public boolean execute(String action, JSONArray args, final CallbackContext callbackContext) throws JSONException {
         PluginResult.Status status = PluginResult.Status.OK;
-        String result = "";
         this.callbackContext = callbackContext;
         
         try {
             if (action.equals("open")) {
-                String url = args.getString(0);
-                String target = args.optString(1);
-                if (target == null || target.equals("") || target.equals(NULL)) {
-                    target = SELF;
+                final String url = args.getString(0);
+                String t = args.optString(1);
+                if (t == null || t.equals("") || t.equals(NULL)) {
+                    t = SELF;
                 }
-                HashMap<String, Boolean> features = parseFeature(args.optString(2));
+                final String target = t;
+                final HashMap<String, Boolean> features = parseFeature(args.optString(2));
                 
                 Log.d(LOG_TAG, "target = " + target);
 
-                url = updateUrl(url);
+                /* updateUrl has been replaced with a Javascript equivalent: urlutil.makeAbsolute().
+                 * The url passed in here from the JS should already be absolute.
+                 */
 
-                // SELF
-                if (SELF.equals(target)) {
-                    Log.d(LOG_TAG, "in self");
-                    // load in webview
-                    if (url.startsWith("file://") || url.startsWith("javascript:") 
-                            || this.webView.isUrlWhiteListed(url)) {
-                        this.webView.loadUrl(url);
+                /* we need to run the following on the UI thread as of Android 4.3 */
+                this.cordova.getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        String result = "";
+                        // SELF
+                        if (SELF.equals(target)) {
+                            Log.d(LOG_TAG, "in self");
+                            // load in webview
+                            if (url.startsWith("file://") || url.startsWith("javascript:") 
+                                    || webView.isUrlWhiteListed(url)) {
+                                webView.loadUrl(url);
+                            }
+                            // load in InAppBrowser
+                            else {
+                                result = showWebPage(url, features);
+                            }
+                        }
+                        // SYSTEM
+                        else if (SYSTEM.equals(target)) {
+                            Log.d(LOG_TAG, "in system");
+                            result = openExternal(url);
+                        }
+                        // BLANK - or anything else
+                        else {
+                            Log.d(LOG_TAG, "in blank");
+                            result = showWebPage(url, features);
+                        }
+                        PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, result);
+                        pluginResult.setKeepCallback(true);
+                        callbackContext.sendPluginResult(pluginResult);
                     }
-                    // load in InAppBrowser
-                    else {
-                        result = this.showWebPage(url, features);
-                    }
-                }
-                // SYSTEM
-                else if (SYSTEM.equals(target)) {
-                    Log.d(LOG_TAG, "in system");
-                    result = this.openExternal(url);
-                }
-                // BLANK - or anything else
-                else {
-                    Log.d(LOG_TAG, "in blank");
-                    result = this.showWebPage(url, features);
-                }
+                });
             }
             else if (action.equals("close")) {
                 closeDialog();
@@ -134,9 +146,6 @@ public class InAppBrowser extends CordovaPlugin {
             else {
                 status = PluginResult.Status.INVALID_ACTION;
             }
-            PluginResult pluginResult = new PluginResult(status, result);
-            pluginResult.setKeepCallback(true);
-            this.callbackContext.sendPluginResult(pluginResult);
         } catch (JSONException e) {
             this.callbackContext.sendPluginResult(new PluginResult(PluginResult.Status.JSON_EXCEPTION));
         }
@@ -168,19 +177,7 @@ public class InAppBrowser extends CordovaPlugin {
         }
     }
 
-    /**
-     * Convert relative URL to full path
-     * 
-     * @param url
-     * @return 
-     */
-    private String updateUrl(String url) {
-        Uri newUrl = Uri.parse(url);
-        if (newUrl.isRelative()) {
-            url = this.webView.getUrl().substring(0, this.webView.getUrl().lastIndexOf("/")+1) + url;
-        }
-        return url;
-    }
+    /* updateUrl has been replaced with a javascript equivalent: urlutil.makeAbsolute() */
 
     /**
      * Display a new browser with the specified URL.
@@ -275,7 +272,10 @@ public class InAppBrowser extends CordovaPlugin {
         // Determine if we should hide the location bar.
         showLocationBar = true;
         if (features != null) {
-            showLocationBar = features.get(LOCATION).booleanValue();
+            Boolean feature = features.get(LOCATION);
+            if (feature != null) {
+                showLocationBar = feature.booleanValue();
+            }
         }
         
         final CordovaWebView thatWebView = this.webView;
