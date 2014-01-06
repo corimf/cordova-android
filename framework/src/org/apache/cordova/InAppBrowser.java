@@ -91,58 +91,68 @@ public class InAppBrowser extends CordovaPlugin {
      * @param callbackId    The callback id used when calling back into JavaScript.
      * @return              A PluginResult object with a status and message.
      */
-    public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
+    public boolean execute(String action, JSONArray args, final CallbackContext callbackContext) throws JSONException {
         PluginResult.Status status = PluginResult.Status.OK;
-        String result = "";
         this.callbackContext = callbackContext;
         
         try {
             if (action.equals("open")) {
-                String url = args.getString(0);
-                String target = args.optString(1);
-                if (target == null || target.equals("") || target.equals(NULL)) {
-                    target = SELF;
+                final String url = args.getString(0);
+                String t = args.optString(1);
+                if (t == null || t.equals("") || t.equals(NULL)) {
+                    t = SELF;
                 }
-                HashMap<String, Boolean> features = parseFeature(args.optString(2));
+                final String target = t;
+                final HashMap<String, Boolean> features = parseFeature(args.optString(2));
                 
                 Log.d(LOG_TAG, "target = " + target);
+                
+                /* updateUrl is now done in JS in urlutil */
 
-                url = updateUrl(url);
-
-                // SELF
-                if (SELF.equals(target)) {
-                    Log.d(LOG_TAG, "in self");
-                    // load in webview
-                    if (url.startsWith("file://") || url.startsWith("javascript:") 
-                            || Config.isUrlWhiteListed(url)) {
-                        this.webView.loadUrl(url);
-                    }
-                    //Load the dialer
-                    else if (url.startsWith(WebView.SCHEME_TEL))
-                    {
-                        try {
-                            Intent intent = new Intent(Intent.ACTION_DIAL);
-                            intent.setData(Uri.parse(url));
-                            this.cordova.getActivity().startActivity(intent);
-                        } catch (android.content.ActivityNotFoundException e) {
-                            LOG.e(LOG_TAG, "Error dialing " + url + ": " + e.toString());
+                this.cordova.getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        String result = "";
+                        // SELF
+                        if (SELF.equals(target)) {
+                            Log.d(LOG_TAG, "in self");
+                            // load in webview
+                            if (url.startsWith("file://") || url.startsWith("javascript:") 
+                                    || Config.isUrlWhiteListed(url)) {
+                                webView.loadUrl(url);
+                            }
+                            //Load the dialer
+                            else if (url.startsWith(WebView.SCHEME_TEL))
+                            {
+                                try {
+                                    Intent intent = new Intent(Intent.ACTION_DIAL);
+                                    intent.setData(Uri.parse(url));
+                                    cordova.getActivity().startActivity(intent);
+                                } catch (android.content.ActivityNotFoundException e) {
+                                    LOG.e(LOG_TAG, "Error dialing " + url + ": " + e.toString());
+                                }
+                            }
+                            // load in InAppBrowser
+                            else {
+                                result = showWebPage(url, features);
+                            }
                         }
+                        // SYSTEM
+                        else if (SYSTEM.equals(target)) {
+                            Log.d(LOG_TAG, "in system");
+                            result = openExternal(url);
+                        }
+                        // BLANK - or anything else
+                        else {
+                            Log.d(LOG_TAG, "in blank");
+                            result = showWebPage(url, features);
+                        }
+                        PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, result);
+                        pluginResult.setKeepCallback(true);
+                        callbackContext.sendPluginResult(pluginResult);
                     }
-                    // load in InAppBrowser
-                    else {
-                        result = this.showWebPage(url, features);
-                    }
-                }
-                // SYSTEM
-                else if (SYSTEM.equals(target)) {
-                    Log.d(LOG_TAG, "in system");
-                    result = this.openExternal(url);
-                }
-                // BLANK - or anything else
-                else {
-                    Log.d(LOG_TAG, "in blank");
-                    result = this.showWebPage(url, features);
-                }
+                });
+                
             }
             else if (action.equals("close")) {
                 closeDialog();
@@ -161,15 +171,21 @@ public class InAppBrowser extends CordovaPlugin {
                 String scriptEnclosure = "(function(d){var c=d.createElement('script');c.type='text/javascript';c.innerText="
                                        + jsonSourceString
                                        + ";d.getElementsByTagName('head')[0].appendChild(c);})(document)";
-                this.inAppWebView.loadUrl("javascript:" + scriptEnclosure);
+                final String finalScriptEnclosure = scriptEnclosure;
+                this.cordova.getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        inAppWebView.loadUrl("javascript:" + finalScriptEnclosure);
 
-                PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
-                this.callbackContext.sendPluginResult(pluginResult);
+                        PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
+                        callbackContext.sendPluginResult(pluginResult);
+                    }
+                });
             }
             else {
                 status = PluginResult.Status.INVALID_ACTION;
             }
-            PluginResult pluginResult = new PluginResult(status, result);
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK);
             pluginResult.setKeepCallback(true);
             this.callbackContext.sendPluginResult(pluginResult);
         } catch (JSONException e) {
@@ -207,19 +223,7 @@ public class InAppBrowser extends CordovaPlugin {
         }
     }
 
-    /**
-     * Convert relative URL to full path
-     * 
-     * @param url
-     * @return 
-     */
-    private String updateUrl(String url) {
-        Uri newUrl = Uri.parse(url);
-        if (newUrl.isRelative()) {
-            url = this.webView.getUrl().substring(0, this.webView.getUrl().lastIndexOf("/")+1) + url;
-        }
-        return url;
-    }
+    /* updateUrl() is now done in JS in urlutil. */
 
     /**
      * Display a new browser with the specified URL.
@@ -245,18 +249,22 @@ public class InAppBrowser extends CordovaPlugin {
      * Closes the dialog
      */
     private void closeDialog() {
+        this.cordova.getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                inAppWebView.loadUrl("about:blank");
+                if (dialog != null) {
+                    dialog.dismiss();
+                }
+            }
+        });
         try {
-            this.inAppWebView.loadUrl("about:blank");
             JSONObject obj = new JSONObject();
             obj.put("type", EXIT_EVENT);
 
             sendUpdate(obj, false);
         } catch (JSONException ex) {
             Log.d(LOG_TAG, "Should never happen");
-        }
-        
-        if (dialog != null) {
-            dialog.dismiss();
         }
     }
 
@@ -287,6 +295,7 @@ public class InAppBrowser extends CordovaPlugin {
         InputMethodManager imm = (InputMethodManager)this.cordova.getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(edittext.getWindowToken(), 0);
 
+        // already running on the UI thread
         if (!url.startsWith("http") && !url.startsWith("file:")) {
             this.inAppWebView.loadUrl("http://" + url);
         } else {
