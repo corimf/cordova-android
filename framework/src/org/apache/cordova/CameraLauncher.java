@@ -243,11 +243,21 @@ public class CameraLauncher extends CordovaPlugin implements MediaScannerConnect
             title = GET_All;
         }
 
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-        if (this.cordova != null) {
-            this.cordova.startActivityForResult((CordovaPlugin) this, Intent.createChooser(intent,
-                    new String(title)), (srcType + 1) * 16 + returnType + 1);
+        if( android.os.Build.VERSION.SDK_INT < 19 ){
+            intent.setAction(Intent.ACTION_GET_CONTENT);
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            if (this.cordova != null) {
+                this.cordova.startActivityForResult((CordovaPlugin) this, Intent.createChooser(intent,
+                        new String(title)), (srcType + 1) * 16 + returnType + 1);
+            }
+        }else{
+            // On KitKat and higher, we want to force opening the Gallary app
+            // Workaround for CB-5398
+            intent.setAction(Intent.ACTION_PICK);
+            intent.setData(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            if (this.cordova != null) {
+                this.cordova.startActivityForResult((CordovaPlugin) this, intent, (srcType + 1) * 16 + returnType + 1);
+            }
         }
     }
 

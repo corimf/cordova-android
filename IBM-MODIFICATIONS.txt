@@ -1,3 +1,20 @@
+RTC: 31535 - Backport CB-5398 (image picker) to ESR
+
+Workaround image picker issue with content:// URIs
+
+- RTC work item number: 31535
+- Apache Cordova Jira issue: https://issues.apache.org/jira/browse/CB-5398
+- Markmail or Google Group reference: http://stackoverflow.com/questions/19834842/android-gallery-on-kitkat-returns-different-uri-for-intent-action-get-content
+- Product PMR: APAR: http://www.ibm.com/support/docview.wss?uid=swg1PI07246
+- Description: Backport CB-5398 to this branch. Without it, starting in Android
+4.4.x, selecting an image with the Camera plugin API would only work when
+the image was chosen from "Downloads" folder, or when the user chose an image by
+going through the Gallery app, or when the image was returned as a DATA_URL.
+This issue is caused by a content:// URI encoding problem with Android. The workaround
+chosen forces the image picker to always go through the Gallery app instead of the 
+StorageAccessFramework, which was introduced in 4.4. 
+
+
 webview methods need to be run on UI thread starting in Android 4.3
 
 - RTC work item number: 31733
