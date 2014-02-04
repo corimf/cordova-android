@@ -195,6 +195,23 @@ public class Capture extends CordovaPlugin {
         this.cordova.startActivityForResult((CordovaPlugin) this, intent, CAPTURE_AUDIO);
     }
 
+    private String getTempDirectoryPath() {
+        File cache = null;
+
+        // SD Card Mounted
+        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            cache = new File(Environment.getExternalStorageDirectory().getAbsolutePath() +
+                    "/Android/data/" + cordova.getActivity().getPackageName() + "/cache/");
+        }
+        // Use internal storage
+        else {
+            cache = cordova.getActivity().getCacheDir();
+        }
+
+        // Create the cache directory if it doesn't exist
+        cache.mkdirs();
+        return cache.getAbsolutePath();
+    }
     /**
      * Sets up an intent to capture images.  Result handled by onActivityResult()
      */
@@ -300,8 +317,19 @@ public class Capture extends CordovaPlugin {
                     this.fail(createErrorObject(CAPTURE_INTERNAL_ERR, "Error capturing image."));
                 }
             } else if (requestCode == CAPTURE_VIDEO) {
-                // Get the uri of the video clip
-                Uri data = intent.getData();
+            
+                Uri data = null;
+                
+                if( intent != null){
+                    // Get the uri of the video clip
+                    data = intent.getData();
+                }
+                
+                if( data == null){
+                   File movie = new File(getTempDirectoryPath(), "Capture.avi");
+                   data = Uri.fromFile(movie);
+                }
+                
                 // create a file object from the uri
                 results.put(createMediaFile(data));
 

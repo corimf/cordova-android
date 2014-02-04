@@ -1,3 +1,17 @@
+RTC: 31827 - PMR 81991,211,788 : video capture on 4.3 Nexus
+
+Video Capture fails with Android 4.3 on Nexus devices
+
+- RTC work item number: 31827
+- Apache Cordova Jira issue: https://issues.apache.org/jira/browse/CB-5202
+- Markmail or Google Group reference: none
+- Product PMR: PMR 81991,211,788
+- Description: Capturing video with a Nexus device running Android 4.3 was failing
+because Android was not returning the correct file location for the newly recorded video.
+The fix involved grabbing the newly created video's file location if it did not exist
+in the intent. The bug seems to be isolated to Nexus devices on Android 4.3.
+
+
 RTC: 31535 - Backport CB-5398 (image picker) to ESR
 
 Workaround image picker issue with content:// URIs
