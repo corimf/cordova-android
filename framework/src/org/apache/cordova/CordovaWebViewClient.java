@@ -63,6 +63,7 @@ public class CordovaWebViewClient extends WebViewClient {
     CordovaWebView appView;
     CordovaUriHelper helper;
     private boolean doClearHistory = false;
+    private boolean isCurrentlyLoading;
 
     /** The authorization tokens. */
     private Hashtable<String, AuthenticationToken> authenticationTokens = new Hashtable<String, AuthenticationToken>();
@@ -145,7 +146,9 @@ public class CordovaWebViewClient extends WebViewClient {
      */
     @Override
     public void onPageStarted(WebView view, String url, Bitmap favicon) {
-
+        super.onPageStarted(view, url, favicon);
+        isCurrentlyLoading = true;
+        LOG.d(TAG, "onPageStarted(" + url + ")");
         // Flush stale messages.
         this.appView.jsMessageQueue.reset();
 
@@ -169,6 +172,11 @@ public class CordovaWebViewClient extends WebViewClient {
     @Override
     public void onPageFinished(WebView view, String url) {
         super.onPageFinished(view, url);
+        // Ignore excessive calls.
+        if (!isCurrentlyLoading) {
+            return;
+        }
+        isCurrentlyLoading = false;
         LOG.d(TAG, "onPageFinished(" + url + ")");
 
         /**
@@ -223,6 +231,10 @@ public class CordovaWebViewClient extends WebViewClient {
      */
     @Override
     public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+        // Ignore error due to stopLoading().
+        if (!isCurrentlyLoading) {
+            return;
+        }
         LOG.d(TAG, "CordovaWebViewClient.onReceivedError: Error code=%s Description=%s URL=%s", errorCode, description, failingUrl);
 
         // Clear timeout flag
