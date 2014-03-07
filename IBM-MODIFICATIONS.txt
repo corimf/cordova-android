@@ -1,0 +1,10 @@
+Fix issue where JS wasn't always being notified of queued events coming
+from the native side. Backport from Jira issue.
+
+- Cordova RTC work item number: 35749
+- Apache Cordova Jira issue: https://issues.apache.org/jira/browse/CB-6047
+- Markmail or Google Group reference: n/a
+- Product PMR: 03480,000,000
+- Description: when messages from the native side were queued for the JS side,
+  the notification would sometimes silently not work and the JS side would not
+  see the messages until later.
