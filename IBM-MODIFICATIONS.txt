@@ -1,3 +1,19 @@
+RTC: 38095 - Investigate/backport CB-4096: whitelist rewrite to 2.9x and below
+
+- RTC work item number: 38095
+- Apache Cordova Jira issue: https://issues.apache.org/jira/browse/CB-4096
+- Markmail or Google Group reference: private mailing list, thread "Fwd: Security Vulnerabilities in Apache Cordova / PhoneGap"
+- Product PMR: none
+- Description: This commit is to pre-emptively backport Whitelist support to 2.6.0esr.
+A security issue was filed against Cordova: http://seclists.org/bugtraq/2014/Jan/96 
+The community response was to claim that most of the identified issues were not a problem
+if users follow best practices: https://wiki.apache.org/cordova/BugtraqResonseDraft
+However, there is valid bug in the Whitelist starting at 2.9.x and below: if foo.com
+is whitelisted, foo.com.evil.com will also pass the whitelist test. This was fixed in 3.1
+by rewriting the whitelist implementation. This commit backports that fix, another required
+for a clean cherry-pick, and reverts to using cordova.api.log instead of cordova.log for 2.6.0
+
+
 RTC: 31827 - PMR 81991,211,788 : video capture on 4.3 Nexus
 
 Video Capture fails with Android 4.3 on Nexus devices
