@@ -10,8 +10,13 @@ The community response was to claim that most of the identified issues were not 
 if users follow best practices: https://wiki.apache.org/cordova/BugtraqResonseDraft
 However, there is valid bug in the Whitelist starting at 2.9.x and below: if foo.com
 is whitelisted, foo.com.evil.com will also pass the whitelist test. This was fixed in 3.1
-by rewriting the whitelist implementation. This commit backports that fix and some other
-commits required for a clean cherry-pick. 
+by rewriting the whitelist implementation. This commit backports that fix and other commits
+required for a clean cherry-pick. Note that if you replace the .jar in a current 2.3 project
+with this updated .jar, you will need to make modifications to your project's
+/src/name/space/Activity.java file to run Config.init() and super.loadUrl(Config). You can see the 
+correct Activity.java file by creating a new project with the updated JAR and looking at the source
+file inside the built Android application. This is because cherry-pick 958424ce changes the 
+bin/templates/project/Activity.java file that is used as the template for your Android project. 
 
 RTC: 31827 - PMR 81991,211,788 : video capture on 4.3 Nexus
 
