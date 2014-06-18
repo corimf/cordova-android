@@ -1,3 +1,15 @@
+Backport content:// URI fix to 3.1 so StorageAccessFramework will work
+RTC: 43945 - In Android 4.4 no videos in the gallery are available at all
+
+- RTC work item number: 43945
+- Apache Cordova Jira issue: https://issues.apache.org/jira/browse/CB-5398
+- Markmail or Google Group reference:
+- Product PMR: APAR: 42806
+- Description: Revert the workaround for image picker problem with content:// URI's.
+Remove the workaround from cordova-plugin-camera, and cherry-pick commits into 
+cordova-android that apply the content URI fix to all URIs, which means the 
+StorageAccessFramework will work correctly with the camera plugin.
+
 Fix issue where JS wasn't always being notified of queued events coming
 from the native side. Backport from Jira issue.
 
