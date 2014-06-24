@@ -33,6 +33,9 @@ import android.webkit.WebView;
 public class IceCreamCordovaWebViewClient extends CordovaWebViewClient {
 
 
+    private static final String TAG = "IceCreamCordovaWebViewClient";
+    private CordovaUriHelper helper;
+
     public IceCreamCordovaWebViewClient(CordovaInterface cordova) {
         super(cordova);
     }
@@ -46,9 +49,17 @@ public class IceCreamCordovaWebViewClient extends CordovaWebViewClient {
         //Check if plugins intercept the request
         WebResourceResponse ret = super.shouldInterceptRequest(view, url);
         
-        if(!Config.isUrlWhiteListed(url) && (url.startsWith("http://") || url.startsWith("https://")))
-        {
-            ret =  getWhitelistResponse();
+        // Check the against the whitelist and lock out access to the WebView directory
+        // Changing this will cause problems for your application
+        // Mike: Pulled this in from b0b628ff but kept the old way of generating
+        // a response from 630c42812ab - did not pull in URI resolver stuff 
+        // from CB-3384 commit 99341bce
+        if (isUrlHarmful(url)) {
+            LOG.w(TAG, "URL blocked by whitelist: " + url);
+            // Results in a 404.
+            // Mike: This used to be getWhitelistResponse() which used an empty byte stream
+            // instead of null - not sure the logic behind this
+            return new WebResourceResponse("text/plain", "UTF-8", null);
         }
         else if(ret == null && (url.contains("?") || url.contains("#") || needsIceCreamSpaceInAssetUrlFix(url))){
             ret = generateWebResourceResponse(url);
@@ -57,14 +68,6 @@ public class IceCreamCordovaWebViewClient extends CordovaWebViewClient {
             ret = this.appView.pluginManager.shouldInterceptRequest(url);
         }
         return ret;
-    }
-    
-    private WebResourceResponse getWhitelistResponse()
-    {
-        WebResourceResponse emptyResponse;
-        String empty = "";
-        ByteArrayInputStream data = new ByteArrayInputStream(empty.getBytes());
-        return new WebResourceResponse("text/plain", "UTF-8", data);
     }
 
     private WebResourceResponse generateWebResourceResponse(String url) {
@@ -97,7 +100,12 @@ public class IceCreamCordovaWebViewClient extends CordovaWebViewClient {
         }
         return null;
     }
-    
+
+    private boolean isUrlHarmful(String url) {
+        return ((url.startsWith("http:") || url.startsWith("https:")) && !Config.isUrlWhiteListed(url))
+            || url.contains("app_webview");
+    }
+
     private static boolean needsIceCreamSpaceInAssetUrlFix(String url) {
         if (!url.contains("%20")){
             return false;
