@@ -43,6 +43,8 @@ public class Config {
     private Whitelist whitelist = new Whitelist();
     private String startUrl;
 
+    private static String errorUrl;
+
     private static Config self = null;
 
     public static void init(Activity action) {
@@ -105,12 +107,19 @@ public class Config {
                 }
                 else if (strNode.equals("preference")) {
                     String name = xml.getAttributeValue(null, "name");
-                    String value = xml.getAttributeValue(null, "value");
 
-                    LOG.i("CordovaLog", "Found preference for %s=%s", name, value);
-                    Log.d("CordovaLog", "Found preference for " + name + "=" + value);
+                    // Mike: Our 2.3.esr never backported 80b369d6d, which split this preference logic
+                    // into pulling out values for specific preferences due to data types
+                    if(name.equalsIgnoreCase("errorurl")){
+                        errorUrl = xml.getAttributeValue(null, "value");
+                    }else{
+                        String value = xml.getAttributeValue(null, "value");
+                        action.getIntent().putExtra(name, value);
+                    }
+                    
+                    //LOG.i("CordovaLog", "Found preference for %s=%s", name, value);
+                    //Log.d("CordovaLog", "Found preference for " + name + "=" + value);
 
-                    action.getIntent().putExtra(name, value);
                 }
                 else if (strNode.equals("content")) {
                     String src = xml.getAttributeValue(null, "src");
@@ -174,5 +183,9 @@ public class Config {
             return "file:///android_asset/www/index.html";
         }
         return self.startUrl;
+    }
+
+    public static String getErrorUrl() {
+        return errorUrl;
     }
 }
