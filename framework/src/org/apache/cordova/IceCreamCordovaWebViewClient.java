@@ -31,6 +31,8 @@ import android.webkit.WebView;
 
 public class IceCreamCordovaWebViewClient extends CordovaWebViewClient {
 
+    private static final String TAG = "IceCreamCordovaWebViewClient";
+    private CordovaUriHelper helper;
 
     public IceCreamCordovaWebViewClient(CordovaInterface cordova) {
         super(cordova);
@@ -42,6 +44,16 @@ public class IceCreamCordovaWebViewClient extends CordovaWebViewClient {
 
     @Override
     public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
+        // Check the against the whitelist and lock out access to the WebView directory
+        // Changing this will cause problems for your application
+        // Mike: This is what we backported from b0b628ff
+        // but left everything else in this file as it was in 2.3.0esr snapshot
+        // which is pretty much nothing
+        if (isUrlHarmful(url)) {
+            LOG.w(TAG, "URL blocked by whitelist: " + url);
+            // Results in a 404.
+            return new WebResourceResponse("text/plain", "UTF-8", null);
+        } 
         if(url.contains("?") || url.contains("#")){
             return generateWebResourceResponse(url);
         } else {
@@ -79,5 +91,10 @@ public class IceCreamCordovaWebViewClient extends CordovaWebViewClient {
         }
         return null;
     }
-    
+
+    private boolean isUrlHarmful(String url) {
+        return ((url.startsWith("http:") || url.startsWith("https:")) && !Config.isUrlWhiteListed(url))
+            || url.contains("app_webview");
+    }
+
 }
