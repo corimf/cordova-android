@@ -1,3 +1,17 @@
+Apply security fixes for cordova-android vulnerabilities
+
+- RTC work item number: 45720
+- Apache Cordova Jira issue: 
+- Markmail or Google Group reference:
+- Product PMR:
+- Description: Severe remote exploitation vulnerabilities were discovered in 
+Cordova-android. These were filed as CVE-2014-3500 (Cross-application scripting
+via Android intent URLs), CVE-2014-3501 (Cordova whitelist bypass for non-http URLs)
+and CVE-2014-3502 (Cordova apps can potentially leak data to other apps via android intent URLs.)
+The fixes included getting errorURL and startURL only from the Config class and never from
+intent extras, editing the whitelist logic, and creating a new "internal" whitelist for
+intent URLs that should be allowed (geo:, sms:, etc.)
+
 Backport content:// URI fix to 3.4 so StorageAccessFramework will work
 RTC: 43945 - In Android 4.4 no videos in the gallery are available at all
 
