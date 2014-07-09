@@ -40,7 +40,8 @@ public class Config {
 
     public static final String TAG = "Config";
 
-    private Whitelist whitelist = new Whitelist();
+    private Whitelist internalWhitelist = new Whitelist();
+    private Whitelist externalWhitelist = new Whitelist();
     private String startUrl;
 
     private static String errorUrl;
@@ -81,9 +82,9 @@ public class Config {
         }
 
         // Add implicitly allowed URLs
-        whitelist.addWhiteListEntry("file:///*", false);
-        whitelist.addWhiteListEntry("content:///*", false);
-        whitelist.addWhiteListEntry("data:*", false);
+        internalWhitelist.addWhiteListEntry("file:///*", false);
+        internalWhitelist.addWhiteListEntry("content:///*", false);
+        internalWhitelist.addWhiteListEntry("data:*", false);
 
         XmlResourceParser xml = action.getResources().getXml(id);
         int eventType = -1;
@@ -94,8 +95,13 @@ public class Config {
                 if (strNode.equals("access")) {
                     String origin = xml.getAttributeValue(null, "origin");
                     String subdomains = xml.getAttributeValue(null, "subdomains");
+                    boolean external = (xml.getAttributeValue(null, "launch-external") != null);
                     if (origin != null) {
-                        whitelist.addWhiteListEntry(origin, (subdomains != null) && (subdomains.compareToIgnoreCase("true") == 0));
+                        if (external) {
+                            externalWhitelist.addWhiteListEntry(origin, (subdomains != null) && (subdomains.compareToIgnoreCase("true") == 0));
+                        } else {
+                            internalWhitelist.addWhiteListEntry(origin, (subdomains != null) && (subdomains.compareToIgnoreCase("true") == 0));
+                        }
                     }
                 }
                 else if (strNode.equals("log")) {
@@ -163,7 +169,7 @@ public class Config {
             Log.e(TAG, "Config was not initialised. Did you forget to Config.init(this)?");
             return;
         }
-        self.whitelist.addWhiteListEntry(origin, subdomains);
+        self.internalWhitelist.addWhiteListEntry(origin, subdomains);
     }
 
     /**
@@ -177,7 +183,15 @@ public class Config {
             Log.e(TAG, "Config was not initialised. Did you forget to Config.init(this)?");
             return false;
         }
-        return self.whitelist.isUrlWhiteListed(url);
+        return self.internalWhitelist.isUrlWhiteListed(url);
+    }
+
+    public static boolean isUrlExternallyWhiteListed(String url) {
+        if (self == null) {
+            Log.e(TAG, "Config was not initialised. Did you forget to Config.init(this)?");
+            return false;
+        }
+        return self.externalWhitelist.isUrlWhiteListed(url);
     }
 
     public static String getStartUrl() {
