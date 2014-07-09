@@ -822,7 +822,8 @@ public class DroidGap extends Activity implements CordovaInterface {
         final DroidGap me = this;
 
         // If errorUrl specified, then load it
-        final String errorUrl = me.getStringProperty("errorUrl", null);
+        // Mike: Change this to use Config.getErrorUrl
+        final String errorUrl = Config.getErrorUrl();
         if ((errorUrl != null) && (errorUrl.startsWith("file://") || Config.isUrlWhiteListed(errorUrl)) && (!failingUrl.equals(errorUrl))) {
 
             // Load URL on UI thread
