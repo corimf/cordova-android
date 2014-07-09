@@ -1,3 +1,22 @@
+Apply security fixes for cordova-android vulnerabilities
+
+- RTC work item number: 45720
+- Apache Cordova Jira issue: 
+- Markmail or Google Group reference:
+- Product PMR:
+- Description: Severe remote exploitation vulnerabilities were discovered in 
+Cordova-android. These were filed as CVE-2014-3500 (Cross-application scripting
+via Android intent URLs), CVE-2014-3501 (Cordova whitelist bypass for non-http URLs)
+and CVE-2014-3502 (Cordova apps can potentially leak data to other apps via android intent URLs.)
+The fixes included getting errorURL and startURL only from the Config class and never from
+intent extras, editing the whitelist logic, and creating a new "internal" whitelist for
+intent URLs that should be allowed (geo:, sms:, etc.). For Cordova 2.6.0esr, we had to 
+manually insert changes from b0b628ff into IceCreamCordovaWebViewClient becuase it was
+not a clean merge due to previous backports. Also had to make some manual adjustments to
+make sure everything compiled, like adding back in the org.apache.cordova.api namespace
+to certain files. 
+
+
 RTC: 38095 - Investigate/backport CB-4096: whitelist rewrite to 2.9x and below
 
 - RTC work item number: 38095

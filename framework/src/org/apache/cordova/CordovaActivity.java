@@ -23,9 +23,9 @@ import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.apache.cordova.CordovaInterface;
-import org.apache.cordova.CordovaPlugin;
-import org.apache.cordova.LOG;
+import org.apache.cordova.api.CordovaInterface;
+import org.apache.cordova.api.CordovaPlugin;
+import org.apache.cordova.api.LOG;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -214,7 +214,10 @@ public class CordovaActivity extends Activity implements CordovaInterface {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         Config.init(this);
-        LOG.i(TAG, "Apache Cordova native platform version " + appView.CORDOVA_VERSION + " is starting");
+        // Mike: Comment thi sout since we did not backport CB-5652 and the set of backports should be
+        // as small as possible
+        // From https://github.com/apache/cordova-android/commit/1deefa48eef2a15c9929093a24b5717a5d4b7074
+        // LOG.i(TAG, "Apache Cordova native platform version " + appView.CORDOVA_VERSION + " is starting");
         LOG.d(TAG, "CordovaActivity.onCreate()");
         super.onCreate(savedInstanceState);
 
