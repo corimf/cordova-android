@@ -263,15 +263,6 @@ public class DroidGap extends Activity implements CordovaInterface {
     public void onCreate(Bundle savedInstanceState) {
         Config.init(this);
         LOG.d(TAG, "DroidGap.onCreate()");
-                LOG.d(TAG, "DroidGap.onCreate()");
-        LOG.d(TAG, "DroidGap.onCreate()");
-        LOG.d(TAG, "DroidGap.onCreate()");
-        LOG.d(TAG, "DroidGap.onCreate()");
-        LOG.d(TAG, "DroidGap.onCreate()");
-        LOG.d(TAG, "DroidGap.onCreate()");
-        LOG.d(TAG, "DroidGap.onCreate()");
-        LOG.d(TAG, "DroidGap.onCreate()");
-
         super.onCreate(savedInstanceState);
 
         if(savedInstanceState != null)
