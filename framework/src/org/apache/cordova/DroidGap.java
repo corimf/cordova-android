@@ -263,6 +263,15 @@ public class DroidGap extends Activity implements CordovaInterface {
     public void onCreate(Bundle savedInstanceState) {
         Config.init(this);
         LOG.d(TAG, "DroidGap.onCreate()");
+                LOG.d(TAG, "DroidGap.onCreate()");
+        LOG.d(TAG, "DroidGap.onCreate()");
+        LOG.d(TAG, "DroidGap.onCreate()");
+        LOG.d(TAG, "DroidGap.onCreate()");
+        LOG.d(TAG, "DroidGap.onCreate()");
+        LOG.d(TAG, "DroidGap.onCreate()");
+        LOG.d(TAG, "DroidGap.onCreate()");
+        LOG.d(TAG, "DroidGap.onCreate()");
+
         super.onCreate(savedInstanceState);
 
         if(savedInstanceState != null)
@@ -880,7 +889,7 @@ public class DroidGap extends Activity implements CordovaInterface {
         final DroidGap me = this;
 
         // If errorUrl specified, then load it
-        final String errorUrl = me.getStringProperty("errorUrl", null);
+        final String errorUrl = Config.getErrorUrl();
         if ((errorUrl != null) && (errorUrl.startsWith("file://") || Config.isUrlWhiteListed(errorUrl)) && (!failingUrl.equals(errorUrl))) {
 
             // Load URL on UI thread
