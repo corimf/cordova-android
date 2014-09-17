@@ -1,0 +1,12 @@
+BIDI text not mirrored correctly in Android dialogs
+
+- RTC work item number: 49825
+- Apache Cordova Jira issue: https://issues.apache.org/jira/browse/CB-7499
+- Markmail or Google Group reference:
+- Product PMR: APAR: 
+- Description: When the device locale is set to a LTR language, any RTL
+string should be left-justified. This fix involved adding supportsLTR
+attribute to AndroidManifest.xml as well as adding some changes into
+cordova-plugin-dialogs to use the device's locale. These changes to the 
+plugin are in commit: c88acd6. The plugin changes don't need to be backported
+because they made it into a plugin refresh that went into WL6.3
