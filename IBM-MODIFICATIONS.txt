@@ -1,3 +1,11 @@
+change in Cordova Android 3.6 initialization breaks WL
+
+- RTC work item number: 52896
+- Apache Cordova Jira issue: https://issues.apache.org/jira/browse/CB-7674
+- Markmail or Google Group reference: http://callback-dev.markmail.org/thread/gcfaz4ffchf3wo2s
+- Product PMR/APAR: found internally before release
+- Description: During the 3.6.0 development timeframe, a modification was made to CordovaActivity.onCreate() to move the activation of preferences to CordovaActivity.init(). For applications that were relying on the activation of preferences in onCreate(), those preferences are no longer active when onCreate() completes, and may break those applications. Although it is described as a "subtle change to the API surface" in the commit message, this is a breaking change to a public API.
+
 BIDI text not mirrored correctly in Android dialogs
 
 - RTC work item number: 49825
