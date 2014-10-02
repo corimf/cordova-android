@@ -1,3 +1,20 @@
+Fix App crash after switching device language
+
+- Cordova RTC work item number: 43844
+- Apache Cordova Jira issue: https://issues.apache.org/jira/browse/CB-7371
+- Markmail or Google Group reference: n/a
+
+- Product PMR: n/a
+- Worklight RTC work item number: 43636
+- Cherry-pick: a5c8472a374c1c2b2026fa9dbb39235e198768ef, af440460e10da89caa167ecb5c266f3857493f90
+- Description: After switching device language on android, the android application was crashing.
+The main reason of this behavior is the config.xml origin="*" tag, this specifies access to 
+all kind of resources on the network and makes the whiteList object on the WhiteList class a null object, 
+indicating that when origin="*", there's no whiteList, all is allowed. There's a condition, right before
+loadUrl(), that it checks the whitelist, and if null, this condition passes and triggers a load of about:blank.
+Applying those cherry picks, those kind of load("about:blank") will be stopped, if the view is currently
+loading a URL,ignoring multiple onPageFinished() callbacks & onReceivedError using stopLoading().
+
 Apply security fixes for cordova-android vulnerabilities
 
 - RTC work item number: 45720
