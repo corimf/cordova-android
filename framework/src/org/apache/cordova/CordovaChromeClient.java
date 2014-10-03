@@ -68,6 +68,9 @@ public class CordovaChromeClient extends WebChromeClient {
     // the video progress view
     private View mVideoProgressView;
     
+    //Keep track of last AlertDialog showed
+    private AlertDialog lastHandledDialog;
+    
     // File Chooser
     public ValueCallback<Uri> mUploadMessage;
     
@@ -139,8 +142,8 @@ public class CordovaChromeClient extends WebChromeClient {
                     return true;
             }
         });
-        dlg.create();
-        dlg.show();
+
+        lastHandledDialog = dlg.show();
         return true;
     }
 
@@ -188,8 +191,7 @@ public class CordovaChromeClient extends WebChromeClient {
                     return true;
             }
         });
-        dlg.create();
-        dlg.show();
+        lastHandledDialog = dlg.show();
         return true;
     }
 
@@ -280,8 +282,8 @@ public class CordovaChromeClient extends WebChromeClient {
                             res.cancel();
                         }
                     });
-            dlg.create();
-            dlg.show();
+
+            lastHandledDialog = dlg.show();
         }
         return true;
     }
@@ -393,4 +395,11 @@ public class CordovaChromeClient extends WebChromeClient {
     public ValueCallback<Uri> getValueCallback() {
         return this.mUploadMessage;
     }
+    
+    public void destroyLastDialog(){
+        if(lastHandledDialog != null){
+                lastHandledDialog.cancel();
+        }
+    }
+
 }
