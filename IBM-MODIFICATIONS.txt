@@ -74,3 +74,13 @@ webview methods need to be run on UI thread starting in Android 4.3
   4.3 the InAppBrowser may fail to open, and calls to window.open for the 
   InAppBrowser would throw a Java exception. Also fixed the project.properties
   file to remove the reference to Google APIs and just use Android APIs.
+
+
+Android L changes type from Mobile to Cellular
+- Cordova RTC work item number: 53257
+- Apache Cordova Jira issue: https://issues.apache.org/jira/browse/CB-7595
+- Markmail / Google Group / StackOverflow reference:
+- IBM PMR: (found before shipped)
+- Worklight RTC work item number:
+- Full description: Android L changes the network type from “mobile” to “cellular”, was returning “unknown” when connected to cellular network because of this issue
+
