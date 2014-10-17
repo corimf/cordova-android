@@ -1,3 +1,20 @@
+Fix leaked window, when hitting back button while alert being rendered
+
+- Cordova RTC work item number: 43292
+- Apache Cordova Jira issue:  https://issues.apache.org/jira/browse/CB-6837
+- Markmail or Google Group reference: n/a
+- Product PMR: n/a
+- Worklight RTC work item number: 42684
+- Cherry-pick: 890e12c30674d7b4dff54082e9ee879505475e19
+- Description: When hitting the back button while alert dialog is being rendered causes a leaked window,
+when resuming the app by clicking on its icon using the home screen or using the Multitask button, 
+the webview doesn't render completely, it shows a blackscreen. 
+
+This is get fixed by keeping track of the last AlertDialog showed.
+The last dialog showed that is rendered while hitting back button it causes a leaked window, 
+so during onDestroy event, the webview will only destroy the last one showed, avoiding 
+the exception and fixing the problem.
+
 Fix App crash after switching device language
 
 - Cordova RTC work item number: 43844
