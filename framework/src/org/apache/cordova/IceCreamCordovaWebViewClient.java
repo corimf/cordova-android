@@ -35,6 +35,7 @@ import android.webkit.WebView;
 public class IceCreamCordovaWebViewClient extends CordovaWebViewClient {
 
     private static final String TAG = "IceCreamCordovaWebViewClient";
+    private static final int VERSION_CODES_KITKAT = 19;   // continue compiling with SDK 18
     private CordovaUriHelper helper;
 
     public IceCreamCordovaWebViewClient(CordovaInterface cordova) {
@@ -81,7 +82,7 @@ public class IceCreamCordovaWebViewClient extends CordovaWebViewClient {
     }
 
     private static boolean needsKitKatContentUrlFix(Uri uri) {
-        return android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT && "content".equals(uri.getScheme());
+        return android.os.Build.VERSION.SDK_INT >= VERSION_CODES_KITKAT && "content".equals(uri.getScheme());
     }
 
     private static boolean needsSpecialsInAssetUrlFix(Uri uri) {
