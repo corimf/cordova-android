@@ -1,3 +1,18 @@
+Fix App crash after switching device language for API 17 and below
+- Cordova RTC work item number: 43844
+- Apache Cordova Jira issue: https://issues.apache.org/jira/browse/CB-7371, related --> https://issues.apache.org/jira/browse/CB-7291
+- Markmail or Google Group reference: n/a
+- Product APAR: 54944
+- Worklight RTC work item number: 43636
+- Description: The previous patch fixed the problem on API 19 Android 4.4.2 KitKat, although the problem
+persist over Android 4.2.2 Jelly Bean and below.
+This the patch taken from 6e222c3938db43fc00f3d6f8fbb138af075c689b(https://github.com/apache/cordova-android/commit/6e222c3938db43fc00f3d6f8fbb138af075c689b)
+fixes the problem by all means, and for all versions. The previous patch doesn't have to be removed.
+This fix, generates an internal whitelist entry when access="*", instead of whitelist=null.
+Creates internal whitelist entries for: http://*/ and https://*/.
+So the unlimited access it becomes into unlimited access for http & https protocol only. 
+Using that approach we can avoid a null object in whiteList and "about:blank" can't be loaded on loadURL method.
+
 Fix leaked window, when hitting back button while alert being rendered
 
 - Cordova RTC work item number: 43292
@@ -20,7 +35,6 @@ Fix App crash after switching device language
 - Cordova RTC work item number: 43844
 - Apache Cordova Jira issue: https://issues.apache.org/jira/browse/CB-7371
 - Markmail or Google Group reference: n/a
-
 - Product PMR: n/a
 - Worklight RTC work item number: 43636
 - Cherry-pick: a5c8472a374c1c2b2026fa9dbb39235e198768ef, af440460e10da89caa167ecb5c266f3857493f90
