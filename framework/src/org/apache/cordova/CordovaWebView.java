@@ -1048,7 +1048,6 @@ public class CordovaWebView extends WebView {
         xml parsing of "content" tag - we're not adding features. 
     */
 	 public static String getStartUrl() {
-        System.out.println("----------------------------- MIKE: getStartUrl!!!");
         //if (self == null || self.startUrl == null) {
             return "file:///android_asset/www/index.html";
         //}
