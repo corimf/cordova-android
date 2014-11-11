@@ -829,9 +829,14 @@ public class DroidGap extends Activity implements CordovaInterface {
         final DroidGap me = this;
 
         // If errorUrl specified, then load it
-        final String errorUrl = me.getStringProperty("errorUrl", null);
+        // final String errorUrl = me.getStringProperty("errorUrl", null);
+        // For CVE-2014-3500, we need to block out getting the errorUrl from an intent, since an attacker can
+        // craft an intent URL and attach a fake errorUrl as an intent extra, thereby redircting the Cordova 
+        // start page to a compromised one. We're just going to remove the errorUrl property all together
+        
+        /*
         if ((errorUrl != null) && (errorUrl.startsWith("file://") || errorUrl.indexOf(me.baseUrl) == 0 || this.appView.isUrlWhiteListed(errorUrl)) && (!failingUrl.equals(errorUrl))) {
-
+            
             // Load URL on UI thread
             me.runOnUiThread(new Runnable() {
                 public void run() {
@@ -840,9 +845,11 @@ public class DroidGap extends Activity implements CordovaInterface {
                     me.appView.showWebPage(errorUrl, false, true, null);
                 }
             });
+            
         }
         // If not, then display error dialog
         else {
+        */
             final boolean exit = !(errorCode == WebViewClient.ERROR_HOST_LOOKUP);
             me.runOnUiThread(new Runnable() {
                 public void run() {
@@ -853,7 +860,7 @@ public class DroidGap extends Activity implements CordovaInterface {
                     }
                 }
             });
-        }
+        // }
     }
 
     /**
