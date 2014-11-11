@@ -384,17 +384,7 @@ public class CordovaWebView extends WebView {
             this.loadUrlNow(url);
         }
         else {
-
-            String initUrl = this.getProperty("url", null);
-
-            // If first page of app, then set URL to load to be the one passed in
-            if (initUrl == null || (this.urls.size() > 0)) {
-                this.loadUrlIntoView(url);
-            }
-            // Otherwise use the URL specified in the activity's extras bundle
-            else {
-                this.loadUrlIntoView(initUrl);
-            }
+            this.loadUrlIntoView(url);
         }
     }
 
@@ -406,15 +396,12 @@ public class CordovaWebView extends WebView {
      * @param time              The number of ms to wait before loading webview
      */
     public void loadUrl(final String url, int time) {
-        String initUrl = this.getProperty("url", null);
-
-        // If first page of app, then set URL to load to be the one passed in
-        if (initUrl == null || (this.urls.size() > 0)) {
-            this.loadUrlIntoView(url, time);
+        if( url == null){
+            this.loadUrlIntoView(this.getStartUrl());
         }
         // Otherwise use the URL specified in the activity's extras bundle
         else {
-            this.loadUrlIntoView(initUrl);
+            this.loadUrlIntoView(url);
         }
     }
 
@@ -1053,4 +1040,19 @@ public class CordovaWebView extends WebView {
 	public boolean isCustomViewShowing() {
 	    return mCustomView != null;
 	}
+	
+	/* Copied in this method from Config() class when trying
+        to backport 6f21a96 for Android security stuff. Easier than
+        backporting the entire Config class. However since we are not
+        backporting Config class, no need to actually ever backport the
+        xml parsing of "content" tag - we're not adding features. 
+    */
+	 public static String getStartUrl() {
+        System.out.println("----------------------------- MIKE: getStartUrl!!!");
+        //if (self == null || self.startUrl == null) {
+            return "file:///android_asset/www/index.html";
+        //}
+   // return self.startUrl;
+    }
+
 }
