@@ -203,9 +203,14 @@ public class CordovaWebViewClient extends WebViewClient {
 
             // If not our application, let default viewer handle
             else {
+            System.out.println("##################################################### inside trying to handle this URL!");
                 try {
                     Intent intent = new Intent(Intent.ACTION_VIEW);
                     intent.setData(Uri.parse(url));
+                    // CVE 3501: filter out non-launchable intents; see 07f81000
+                    intent.addCategory(Intent.CATEGORY_BROWSABLE);
+                    intent.setComponent(null);
+                    intent.setSelector(null);
                     this.cordova.getActivity().startActivity(intent);
                 } catch (android.content.ActivityNotFoundException e) {
                     LOG.e(TAG, "Error loading url " + url, e);

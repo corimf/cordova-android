@@ -860,7 +860,7 @@ public class DroidGap extends Activity implements CordovaInterface {
                     }
                 }
             });
-        // }
+       // }
     }
 
     /**
