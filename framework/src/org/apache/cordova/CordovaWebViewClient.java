@@ -39,6 +39,7 @@ import android.util.Log;
 import android.view.View;
 import android.webkit.HttpAuthHandler;
 import android.webkit.SslErrorHandler;
+import android.os.Build;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -112,6 +113,7 @@ public class CordovaWebViewClient extends WebViewClient {
      * @param url           The url to be loaded.
      * @return              true to override, false for default behavior
      */
+    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1)
 	@Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
     	// Check if it's an exec() bridge command message.
@@ -203,14 +205,15 @@ public class CordovaWebViewClient extends WebViewClient {
 
             // If not our application, let default viewer handle
             else {
-            System.out.println("##################################################### inside trying to handle this URL!");
                 try {
                     Intent intent = new Intent(Intent.ACTION_VIEW);
                     intent.setData(Uri.parse(url));
                     // CVE 3501: filter out non-launchable intents; see 07f81000
                     intent.addCategory(Intent.CATEGORY_BROWSABLE);
                     intent.setComponent(null);
-                    intent.setSelector(null);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1) {
+                        intent.setSelector(null);
+                    }
                     this.cordova.getActivity().startActivity(intent);
                 } catch (android.content.ActivityNotFoundException e) {
                     LOG.e(TAG, "Error loading url " + url, e);
