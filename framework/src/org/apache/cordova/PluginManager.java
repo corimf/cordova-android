@@ -190,9 +190,19 @@ public class PluginManager {
      * Create plugins objects that have onload set.
      */
     public void startupPlugins() {
+<<<<<<< HEAD
         for (PluginEntry entry : this.entries.values()) {
             if (entry.onload) {
                 entry.createPlugin(this.app, this.ctx);
+=======
+        for (PluginEntry entry : entryMap.values()) {
+            // Add a null entry to for each non-startup plugin to avoid ConcurrentModificationException
+            // When iterating plugins.
+            if (entry.onload) {
+                getPlugin(entry.service);
+            } else {
+                pluginMap.put(entry.service, null);
+>>>>>>> 1feaa7f... CB-8031 Fix race condition that shows as ConcurrentModificationException
             }
         }
     }
@@ -308,9 +318,15 @@ public class PluginManager {
      * @param multitasking      Flag indicating if multitasking is turned on for app
      */
     public void onPause(boolean multitasking) {
+<<<<<<< HEAD
         for (PluginEntry entry : this.entries.values()) {
             if (entry.plugin != null) {
                 entry.plugin.onPause(multitasking);
+=======
+        for (CordovaPlugin plugin : this.pluginMap.values()) {
+            if (plugin != null) {
+                plugin.onPause(multitasking);
+>>>>>>> 1feaa7f... CB-8031 Fix race condition that shows as ConcurrentModificationException
             }
         }
     }
@@ -321,9 +337,15 @@ public class PluginManager {
      * @param multitasking      Flag indicating if multitasking is turned on for app
      */
     public void onResume(boolean multitasking) {
+<<<<<<< HEAD
         for (PluginEntry entry : this.entries.values()) {
             if (entry.plugin != null) {
                 entry.plugin.onResume(multitasking);
+=======
+        for (CordovaPlugin plugin : this.pluginMap.values()) {
+            if (plugin != null) {
+                plugin.onResume(multitasking);
+>>>>>>> 1feaa7f... CB-8031 Fix race condition that shows as ConcurrentModificationException
             }
         }
     }
@@ -332,9 +354,15 @@ public class PluginManager {
      * The final call you receive before your activity is destroyed.
      */
     public void onDestroy() {
+<<<<<<< HEAD
         for (PluginEntry entry : this.entries.values()) {
             if (entry.plugin != null) {
                 entry.plugin.onDestroy();
+=======
+        for (CordovaPlugin plugin : this.pluginMap.values()) {
+            if (plugin != null) {
+                plugin.onDestroy();
+>>>>>>> 1feaa7f... CB-8031 Fix race condition that shows as ConcurrentModificationException
             }
         }
     }
@@ -351,9 +379,15 @@ public class PluginManager {
         if (obj != null) {
             return obj;
         }
+<<<<<<< HEAD
         for (PluginEntry entry : this.entries.values()) {
             if (entry.plugin != null) {
                 obj = entry.plugin.onMessage(id, data);
+=======
+        for (CordovaPlugin plugin : this.pluginMap.values()) {
+            if (plugin != null) {
+                obj = plugin.onMessage(id, data);
+>>>>>>> 1feaa7f... CB-8031 Fix race condition that shows as ConcurrentModificationException
                 if (obj != null) {
                     return obj;
                 }
@@ -366,9 +400,15 @@ public class PluginManager {
      * Called when the activity receives a new intent.
      */
     public void onNewIntent(Intent intent) {
+<<<<<<< HEAD
         for (PluginEntry entry : this.entries.values()) {
             if (entry.plugin != null) {
                 entry.plugin.onNewIntent(intent);
+=======
+        for (CordovaPlugin plugin : this.pluginMap.values()) {
+            if (plugin != null) {
+                plugin.onNewIntent(intent);
+>>>>>>> 1feaa7f... CB-8031 Fix race condition that shows as ConcurrentModificationException
             }
         }
     }
@@ -405,9 +445,13 @@ public class PluginManager {
      * Called when the app navigates or refreshes.
      */
     public void onReset() {
+<<<<<<< HEAD
         Iterator<PluginEntry> it = this.entries.values().iterator();
         while (it.hasNext()) {
             CordovaPlugin plugin = it.next().plugin;
+=======
+        for (CordovaPlugin plugin : this.pluginMap.values()) {
+>>>>>>> 1feaa7f... CB-8031 Fix race condition that shows as ConcurrentModificationException
             if (plugin != null) {
                 plugin.onReset();
             }
@@ -423,9 +467,15 @@ public class PluginManager {
     }
 
     Uri remapUri(Uri uri) {
+<<<<<<< HEAD
         for (PluginEntry entry : this.entries.values()) {
             if (entry.plugin != null) {
                 Uri ret = entry.plugin.remapUri(uri);
+=======
+        for (CordovaPlugin plugin : this.pluginMap.values()) {
+            if (plugin != null) {
+                Uri ret = plugin.remapUri(uri);
+>>>>>>> 1feaa7f... CB-8031 Fix race condition that shows as ConcurrentModificationException
                 if (ret != null) {
                     return ret;
                 }
