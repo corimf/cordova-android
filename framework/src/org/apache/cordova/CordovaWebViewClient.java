@@ -113,9 +113,9 @@ public class CordovaWebViewClient extends WebViewClient {
      * @param url           The url to be loaded.
      * @return              true to override, false for default behavior
      */
-    @TargetApi(Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1)
 	@Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
+
     	// Check if it's an exec() bridge command message.
     	if (NativeToJsMessageQueue.ENABLE_LOCATION_CHANGE_EXEC_MODE && url.startsWith(CORDOVA_EXEC_URL_PREFIX)) {
     		handleExecUrl(url);

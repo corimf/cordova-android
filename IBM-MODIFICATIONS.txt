@@ -1,0 +1,19 @@
+Apply security fixes for cordova-android vulnerabilities
+
+- RTC work item number: 45720
+- Apache Cordova Jira issue: 
+- Markmail or Google Group reference:
+- Product PMR:
+- Description: Severe remote exploitation vulnerabilities were discovered in 
+Cordova-android. These were filed as CVE-2014-3500 (Cross-application scripting
+via Android intent URLs), CVE-2014-3501 (Cordova whitelist bypass for non-http URLs)
+and CVE-2014-3502 (Cordova apps can potentially leak data to other apps via android intent URLs.)
+Because this stream is so out of date, we chose to apply as many security fixes as possible knowing
+that most would not be a one-to-one backport but instead a manual copy of the functionality. 
+For CVE 3500, we were able to remove the ability to set the startURL and errorURL from an Intent.
+Now, the startURL will always be file:///android_asset/www/index.html - it cannot be customized. The 
+errorUrl is not used and a dialog is instead shown if there is an error page.
+For CVE 3501, we make sure to add the CATEGORY_BROWSABLE to any intents not explicitly handled by
+the Cordova code (like sms:, mailto:, etc.,) so that these intents can only be opened by a browser.
+For CVE 3502 we block access to "app_webview" folder that contains cookies, SQLite databases, and other
+potentially sensitive data. 

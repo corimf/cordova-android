@@ -42,7 +42,9 @@ public class IceCreamCordovaWebViewClient extends CordovaWebViewClient {
 
     @Override
     public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
-        if(url.contains("?") || url.contains("#")){
+        // CVE 3502 - lock out access to internal app_webview to protect
+        // sensitive personal data like cookies files
+        if(url.contains("?") || url.contains("#") || url.contains("app_webview")){
             return generateWebResourceResponse(url);
         } else {
             return super.shouldInterceptRequest(view, url);
