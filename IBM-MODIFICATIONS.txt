@@ -89,3 +89,11 @@ Android L changes type from Mobile to Cellular
 - Worklight RTC work item number:
 - Full description: Android L changes the network type from “mobile” to “cellular”, was returning “unknown” when connected to cellular network because of this issue
 
+Apply security fixes to tighten up Java methods exposed via addJavascriptInterface()
+
+- RTC work item number: 55240
+- Apache Cordova Jira issue: https://github.com/corimf/cordova-android/commit/8f54290eeccab441504f9e3a913a4fbacd3b89d6
+- Markmail or Google Group reference:
+- Product PMR: APAR PI30009 (RTC 57373)
+- Description: Prevent undesired Java methods from being exposed via addJavaScriptInterface()
+
