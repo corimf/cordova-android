@@ -1,3 +1,13 @@
+Fix JSONStore.init() hangs for Android devices
+
+- Cordova RTC work item number: 59273
+- Apache Cordova Jira issue: https://issues.apache.org/jira/browse/CB-6047(already applied), https://issues.apache.org/jira/browse/CB-6761, https://issues.apache.org/jira/browse/CB-7261
+- Markmail or Google Group reference:
+- Product PMR: APAR PI30969 (RTC 59178)
+- Description: JSONStore.init() hangs is caused by a lack of good handling on the reset and toggling events
+on NativeToJsMessageQueue.java class, the changes applied on this fix are going to properly handle the Online events,
+handling the queue of messages on page transitions, and general optimization. More information on RTC work item.
+
 Apply security fixes for cordova-android vulnerabilities
 
 - RTC work item number: 55240
