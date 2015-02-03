@@ -18,7 +18,8 @@ able to use intents to start their app or inject preferences.
 Fix app crash due to ConcurrentModificationException
 
 - Cordova RTC work item number: 60315
-- Apache Cordova Jira issue: https://issues.apache.org/jira/browse/CB-8031
+- Apache Cordova Jira issue: https://issues.apache.org/jira/browse/CB-8031 and 
+     https://issues.apache.org/jira/browse/CB-8031
 - Markmail / Google Group / StackOverflow reference:
 - IBM PMR: 9X999,999,000
 - Worklight RTC work item number: (APAR) 60069
@@ -29,7 +30,8 @@ a plugin calls "getPlugin()" while the ui thread is dispatching an onMessage (or
 the various other plugin functions), then the "for (CordovaPlugin p : pluginMap.values())"
 fires an exception due to getPlugin() modifying the map. This is a race condition and 
 is solved by adding a null entry for each non-startup plugin to avoid the
-ConcurrentModificationException.
+ConcurrentModificationException. 
+Also need to create the webview before initializing plugins. 
 
 Fix leaked window, when hitting back button while alert being rendered
 
