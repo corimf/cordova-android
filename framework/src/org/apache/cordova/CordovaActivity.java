@@ -333,17 +333,19 @@ public class CordovaActivity extends Activity implements CordovaInterface {
         LOG.d(TAG, "CordovaActivity.init()");
 
         appView = webView != null ? webView : makeWebView();
-        if (appView.pluginManager == null) {
-            appView.init(this, webViewClient != null ? webViewClient : makeWebViewClient(appView),
-                    webChromeClient != null ? webChromeClient : makeChromeClient(appView),
-                    pluginEntries, internalWhitelist, externalWhitelist, preferences);
-        }
 
         // TODO: Have the views set this themselves.
         if (preferences.getBoolean("DisallowOverscroll", false)) {
             appView.setOverScrollMode(View.OVER_SCROLL_NEVER);
         }
         createViews();
+        
+        // Init plugins only after creating views
+        if (appView.pluginManager == null) {
+            appView.init(this, webViewClient != null ? webViewClient : makeWebViewClient(appView),
+                    webChromeClient != null ? webChromeClient : makeChromeClient(appView),
+                    pluginEntries, internalWhitelist, externalWhitelist, preferences);
+        }
 
         // TODO: Make this a preference (CB-6153)
         // Setup the hardware volume controls to handle volume control
