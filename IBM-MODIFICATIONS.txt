@@ -1,0 +1,15 @@
+Fix app crash due to ConcurrentModificationException
+
+- Cordova RTC work item number: 60315
+- Apache Cordova Jira issue: https://issues.apache.org/jira/browse/CB-8031
+- Markmail / Google Group / StackOverflow reference:
+- IBM PMR: 9X999,999,000
+- Worklight RTC work item number: (APAR) 60069
+- Cherry-pick: 1feaa7fed717d1f6e02508a280190c3d6914f95c
+- Full description: Using plugins sometimes causes the application to crash because of 
+a ConcurrentModificationException. Plugins execute on non-ui thread by default, and if 
+a plugin calls "getPlugin()" while the ui thread is dispatching an onMessage (or one of 
+the various other plugin functions), then the "for (CordovaPlugin p : pluginMap.values())"
+fires an exception due to getPlugin() modifying the map. This is a race condition and 
+is solved by adding a null entry for each non-startup plugin to avoid the
+ConcurrentModificationException.
