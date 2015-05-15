@@ -1,3 +1,20 @@
+Security Vulnerability Patch for Exploiting Intents
+
+- Cordova RTC work item number: 75631
+- Apache Cordova Jira issue: 
+- Markmail / Google Group / StackOverflow reference:
+- IBM PMR: 9X999,999,000
+- Worklight RTC work item number: (APAR) 75615
+- Cherry-pick: a64203f8174b42d6359f0bbdc7b69d96497b203a
+- CVE-2015-1835: Remote exploit of secondary configuration variables in Apache Cordova on Android
+- Full description: Unwanted users are able to use intents to start an application 
+and modify the config.xml with preferences that the developer did not specify. The 
+intent injects the preference tag with a name and value into the config.xml so the 
+unwanted user is able to start and exploit the application remotely. The vulnerability 
+is limited to injecting the preference tag, but it is still exploiting the application 
+nonetheless. The fix for this is to remove the intent functionality. No one will be 
+able to use intents to start their app or inject preferences. 
+
 Fix app crash due to ConcurrentModificationException
 
 - Cordova RTC work item number: 60315
