@@ -84,8 +84,7 @@ import android.widget.LinearLayout;
  * Cordova xml configuration: Cordova uses a configuration file at 
  * res/xml/config.xml to specify its settings. See "The config.xml File"
  * guide in cordova-docs at http://cordova.apache.org/docs for the documentation
- * for the configuration. The use of the set*Property() methods is
- * deprecated in favor of the config.xml file.
+ * for the configuration.
  *
  */
 public class CordovaActivity extends Activity implements CordovaInterface {
@@ -146,6 +145,8 @@ public class CordovaActivity extends Activity implements CordovaInterface {
     private String initCallbackClass;
 
     private Object LOG_TAG;
+    
+    private CordovaPreferences preferences;
 
     /**
     * Sets the authentication token.
@@ -216,18 +217,19 @@ public class CordovaActivity extends Activity implements CordovaInterface {
         Config.init(this);
         LOG.d(TAG, "CordovaActivity.onCreate()");
         super.onCreate(savedInstanceState);
+        preferences = Config.getPreferences();
 
         if(savedInstanceState != null)
         {
             initCallbackClass = savedInstanceState.getString("callbackClass");
         }
         
-        if(!this.getBooleanProperty("ShowTitle", false))
+        if(!preferences.getBoolean("ShowTitle", false))
         {
             getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         }
 
-        if(this.getBooleanProperty("SetFullscreen", false))
+        if(preferences.getBoolean("SetFullscreen", false))
         {
             Log.d(TAG, "The SetFullscreen configuration is deprecated in favor of Fullscreen, and will be removed in a future version.");
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
@@ -333,7 +335,7 @@ public class CordovaActivity extends Activity implements CordovaInterface {
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 1.0F));
 
-        if (this.getBooleanProperty("DisallowOverscroll", false)) {
+        if (preferences.getBoolean("DisallowOverscroll", false)) {
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.GINGERBREAD) {
                 this.appView.setOverScrollMode(CordovaWebView.OVER_SCROLL_NEVER);
             }
@@ -361,10 +363,10 @@ public class CordovaActivity extends Activity implements CordovaInterface {
             this.init();
         }
 
-        this.splashscreenTime = this.getIntegerProperty("SplashScreenDelay", this.splashscreenTime);
+        this.splashscreenTime = preferences.getInteger("SplashScreenDelay", this.splashscreenTime);
         if(this.splashscreenTime > 0)
         {
-            this.splashscreen = this.getIntegerProperty("SplashScreen", 0);
+            this.splashscreen = preferences.getInteger("SplashScreen", 0);
             if(this.splashscreen != 0)
             {
                 this.showSplashScreen(this.splashscreenTime);
@@ -372,11 +374,11 @@ public class CordovaActivity extends Activity implements CordovaInterface {
         }
         
         // Set backgroundColor
-        this.backgroundColor = this.getIntegerProperty("BackgroundColor", Color.BLACK);
+        this.backgroundColor = preferences.getInteger("BackgroundColor", Color.BLACK);
         this.root.setBackgroundColor(this.backgroundColor);
 
         // If keepRunning
-        this.keepRunning = this.getBooleanProperty("KeepRunning", true);
+        this.keepRunning = preferences.getBoolean("KeepRunning", true);
 
         //Check if the view is attached to anything
         if(appView.getParent() != null)
@@ -415,7 +417,7 @@ public class CordovaActivity extends Activity implements CordovaInterface {
         }
 
         this.splashscreenTime = time;
-        this.splashscreen = this.getIntegerProperty("SplashScreen", 0);
+        this.splashscreen = preferences.getInteger("SplashScreen", 0);
         this.showSplashScreen(this.splashscreenTime);
         this.appView.loadUrl(url, time);
         */
@@ -429,10 +431,10 @@ public class CordovaActivity extends Activity implements CordovaInterface {
         // If loadingDialog property, then show the App loading dialog for first page of app
         String loading = null;
         if ((this.appView == null) || !this.appView.canGoBack()) {
-            loading = this.getStringProperty("LoadingDialog", null);
+            loading = preferences.getString("LoadingDialog", null);
         }
         else {
-            loading = this.getStringProperty("LoadingPageDialog", null);
+            loading = preferences.getString("LoadingPageDialog", null);
         }
         if (loading != null) {
 
@@ -504,167 +506,6 @@ public class CordovaActivity extends Activity implements CordovaInterface {
         super.onConfigurationChanged(newConfig);
     }
 
-    /**
-     * Get boolean property for activity.
-     *
-     * @param name
-     * @param defaultValue
-     * @return the boolean value of the named property
-     */
-    public boolean getBooleanProperty(String name, boolean defaultValue) {
-        Bundle bundle = this.getIntent().getExtras();
-        if (bundle == null) {
-            return defaultValue;
-        }
-        name = name.toLowerCase(Locale.getDefault());
-        Boolean p;
-        try {
-            p = (Boolean) bundle.get(name);
-        } catch (ClassCastException e) {
-            String s = bundle.get(name).toString();
-            if ("true".equals(s)) {
-                p = true;
-            }
-            else {
-                p = false;
-            }
-        }
-        if (p == null) {
-            return defaultValue;
-        }
-        return p.booleanValue();
-    }
-
-    /**
-     * Get int property for activity.
-     *
-     * @param name
-     * @param defaultValue
-     * @return the int value for the named property
-     */
-    public int getIntegerProperty(String name, int defaultValue) {
-        Bundle bundle = this.getIntent().getExtras();
-        if (bundle == null) {
-            return defaultValue;
-        }
-        name = name.toLowerCase(Locale.getDefault());
-        Integer p;
-        try {
-            p = (Integer) bundle.get(name);
-        } catch (ClassCastException e) {
-            p = Integer.parseInt(bundle.get(name).toString());
-        }
-        if (p == null) {
-            return defaultValue;
-        }
-        return p.intValue();
-    }
-
-    /**
-     * Get string property for activity.
-     *
-     * @param name
-     * @param defaultValue
-     * @return the String value for the named property
-     */
-    public String getStringProperty(String name, String defaultValue) {
-        Bundle bundle = this.getIntent().getExtras();
-        if (bundle == null) {
-            return defaultValue;
-        }
-        name = name.toLowerCase(Locale.getDefault());
-        String p = bundle.getString(name);
-        if (p == null) {
-            return defaultValue;
-        }
-        return p;
-    }
-
-    /**
-     * Get double property for activity.
-     *
-     * @param name
-     * @param defaultValue
-     * @return the double value for the named property
-     */
-    public double getDoubleProperty(String name, double defaultValue) {
-        Bundle bundle = this.getIntent().getExtras();
-        if (bundle == null) {
-            return defaultValue;
-        }
-        name = name.toLowerCase(Locale.getDefault());
-        Double p;
-        try {
-            p = (Double) bundle.get(name);
-        } catch (ClassCastException e) {
-            p = Double.parseDouble(bundle.get(name).toString());
-        }
-        if (p == null) {
-            return defaultValue;
-        }
-        return p.doubleValue();
-    }
-
-    /**
-     * Set boolean property on activity.
-     * This method has been deprecated in 3.0 and will be removed at a future
-     * time. Please use config.xml instead.
-     *
-     * @param name
-     * @param value
-     * @deprecated
-     */
-    @Deprecated
-    public void setBooleanProperty(String name, boolean value) {
-        Log.d(TAG, "Setting boolean properties in CordovaActivity will be deprecated in 3.0 on July 2013, please use config.xml");
-        this.getIntent().putExtra(name.toLowerCase(), value);
-    }
-
-    /**
-     * Set int property on activity.
-     * This method has been deprecated in 3.0 and will be removed at a future
-     * time. Please use config.xml instead.
-     *
-     * @param name
-     * @param value
-     * @deprecated
-     */
-    @Deprecated
-    public void setIntegerProperty(String name, int value) {
-        Log.d(TAG, "Setting integer properties in CordovaActivity will be deprecated in 3.0 on July 2013, please use config.xml");
-        this.getIntent().putExtra(name.toLowerCase(), value);
-    }
-
-    /**
-     * Set string property on activity.
-     * This method has been deprecated in 3.0 and will be removed at a future
-     * time. Please use config.xml instead.
-     *
-     * @param name
-     * @param value
-     * @deprecated
-     */
-    @Deprecated
-    public void setStringProperty(String name, String value) {
-        Log.d(TAG, "Setting string properties in CordovaActivity will be deprecated in 3.0 on July 2013, please use config.xml");
-        this.getIntent().putExtra(name.toLowerCase(), value);
-    }
-
-    /**
-     * Set double property on activity.
-     * This method has been deprecated in 3.0 and will be removed at a future
-     * time. Please use config.xml instead.
-     *
-     * @param name
-     * @param value
-     * @deprecated
-     */
-    @Deprecated
-    public void setDoubleProperty(String name, double value) {
-        Log.d(TAG, "Setting double properties in CordovaActivity will be deprecated in 3.0 on July 2013, please use config.xml");
-        this.getIntent().putExtra(name.toLowerCase(), value);
-    }
-
     @Override
     /**
      * Called when the system is about to start resuming a previous activity.
@@ -715,7 +556,7 @@ public class CordovaActivity extends Activity implements CordovaInterface {
         
 
         //Code to test CB-3064
-        String errorUrl = Config.getErrorUrl();
+        String errorUrl = preferences.getString("ErrorUrl", null);
         LOG.d(TAG, "CB-3064: The errorUrl is " + errorUrl);
           
         if (this.activityState == ACTIVITY_STARTING) {
@@ -914,7 +755,7 @@ public class CordovaActivity extends Activity implements CordovaInterface {
         final CordovaActivity me = this;
 
         // If errorUrl specified, then load it
-        final String errorUrl = me.getStringProperty("errorUrl", null);
+        final String errorUrl = preferences.getString("errorUrl", null);
         if ((errorUrl != null) && (errorUrl.startsWith("file://") || Config.isUrlWhiteListed(errorUrl)) && (!failingUrl.equals(errorUrl))) {
 
             // Load URL on UI thread
@@ -1064,7 +905,7 @@ public class CordovaActivity extends Activity implements CordovaInterface {
                 root.setMinimumHeight(display.getHeight());
                 root.setMinimumWidth(display.getWidth());
                 root.setOrientation(LinearLayout.VERTICAL);
-                root.setBackgroundColor(that.getIntegerProperty("backgroundColor", Color.BLACK));
+                root.setBackgroundColor(preferences.getInteger("backgroundColor", Color.BLACK));
                 root.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                         ViewGroup.LayoutParams.MATCH_PARENT, 0.0F));
                 root.setBackgroundResource(that.splashscreen);
@@ -1142,7 +983,7 @@ public class CordovaActivity extends Activity implements CordovaInterface {
             else {
                 // If the splash dialog is showing don't try to show it again
                 if (this.splashDialog == null || !this.splashDialog.isShowing()) {
-                    this.splashscreen = this.getIntegerProperty("SplashScreen", 0);
+                    this.splashscreen = preferences.getInteger("SplashScreen", 0);
                     this.showSplashScreen(this.splashscreenTime);
                 }
             }

@@ -106,6 +106,8 @@ public class CordovaWebView extends WebView {
     private ActivityResult mResult = null;
 
     private CordovaResourceApi resourceApi;
+    
+    private CordovaPreferences preferences;
 
     class ActivityResult {
         
@@ -417,14 +419,13 @@ public class CordovaWebView extends WebView {
      * @param url
      * @param time              The number of ms to wait before loading webview
      */
-    @Deprecated
     public void loadUrl(final String url, int time) {
-        if(url == null)
-        {
+        // If first page of app, then set URL to load to be the one passed in
+        if (url == null) {
             this.loadUrlIntoView(Config.getStartUrl());
         }
-        else
-        {
+        // Otherwise use the URL specified in the activity's extras bundle
+        else {
             this.loadUrlIntoView(url);
         }
     }
@@ -449,7 +450,7 @@ public class CordovaWebView extends WebView {
         // Create a timeout timer for loadUrl
         final CordovaWebView me = this;
         final int currentLoadUrlTimeout = me.loadUrlTimeout;
-        final int loadUrlTimeoutValue = Integer.parseInt(this.getProperty("LoadUrlTimeoutValue", "20000"));
+        final int loadUrlTimeoutValue = preferences.getInteger("LoadUrlTimeoutValue", 20000);
 
         // Timeout error method
         final Runnable loadError = new Runnable() {
@@ -531,11 +532,6 @@ public class CordovaWebView extends WebView {
         this.loadUrlIntoView(url);
     }
     
-    @Override
-    public void stopLoading() {
-        viewClient.isCurrentlyLoading = false;
-        super.stopLoading();
-    }
     
     public void onScrollChanged(int l, int t, int oldl, int oldt)
     {
@@ -653,31 +649,12 @@ public class CordovaWebView extends WebView {
      *      <log level="DEBUG" />
      */
     private void loadConfiguration() {
+        preferences = Config.getPreferences();
  
-        if ("true".equals(this.getProperty("Fullscreen", "false"))) {
+        if (preferences.getBoolean("Fullscreen", false)) {
             this.cordova.getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
             this.cordova.getActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         }
-    }
-
-    /**
-     * Get string property for activity.
-     *
-     * @param name
-     * @param defaultValue
-     * @return the String value for the named property
-     */
-    public String getProperty(String name, String defaultValue) {
-        Bundle bundle = this.cordova.getActivity().getIntent().getExtras();
-        if (bundle == null) {
-            return defaultValue;
-        }
-        name = name.toLowerCase(Locale.getDefault());
-        Object p = bundle.get(name);
-        if (p == null) {
-            return defaultValue;
-        }
-        return p.toString();
     }
 
     /*
@@ -856,9 +833,6 @@ public class CordovaWebView extends WebView {
 
         // Load blank page so that JavaScript onunload is called
         this.loadUrl("about:blank");
-        
-        //Remove last AlertDialog
-        this.chromeClient.destroyLastDialog();
 
         // Forward to plugins
         if (this.pluginManager != null) {
