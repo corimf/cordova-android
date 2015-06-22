@@ -43,6 +43,8 @@ public class Config {
     private static String errorUrl;
 
     private static Config self = null;
+    
+    public static CordovaPreferences prefs = new CordovaPreferences();
 
     public static void init(Activity action) {
         //Just re-initialize this! Seriously, we lose this all the time
@@ -107,69 +109,9 @@ public class Config {
                     }
                 }
                 else if (strNode.equals("preference")) {
-                    String name = xml.getAttributeValue(null, "name").toLowerCase(Locale.getDefault());
-                    /* Java 1.6 does not support switch-based strings
-                       Java 7 does, but we're using Dalvik, which is apparently not Java.
-                       Since we're reading XML, this has to be an ugly if/else.
-                       
-                       Also, due to cast issues, each of them has to call their separate putExtra!  
-                       Wheee!!! Isn't Java FUN!?!?!?
-                       
-                       Note: We should probably pass in the classname for the variable splash on splashscreen!
-                       */
-                    if (name.equalsIgnoreCase("LogLevel")) {
-                        String level = xml.getAttributeValue(null, "value");
-                        LOG.setLogLevel(level);
-                    } else if (name.equalsIgnoreCase("SplashScreen")) {
-                        String value = xml.getAttributeValue(null, "value");
-                        int resource = 0;
-                        if (value == null)
-                        {
-                            value = "splash";
-                        }
-                        resource = action.getResources().getIdentifier(value, "drawable", action.getPackageName());
-                        
-                        action.getIntent().putExtra(name, resource);
-                    }
-                    else if(name.equalsIgnoreCase("BackgroundColor")) {
-                        int value = xml.getAttributeIntValue(null, "value", Color.BLACK);
-                        action.getIntent().putExtra(name, value);
-                    }
-                    else if(name.equalsIgnoreCase("LoadUrlTimeoutValue")) {
-                        int value = xml.getAttributeIntValue(null, "value", 20000);
-                        action.getIntent().putExtra(name, value);
-                    }
-                    else if(name.equalsIgnoreCase("SplashScreenDelay")) {
-                        int value = xml.getAttributeIntValue(null, "value", 3000);
-                        action.getIntent().putExtra(name, value);
-                    }
-                    else if(name.equalsIgnoreCase("KeepRunning"))
-                    {
-                        boolean value = xml.getAttributeValue(null, "value").equals("true");
-                        action.getIntent().putExtra(name, value);
-                    }
-                    else if(name.equalsIgnoreCase("InAppBrowserStorageEnabled"))
-                    {
-                        boolean value = xml.getAttributeValue(null, "value").equals("true");
-                        action.getIntent().putExtra(name, value);
-                    }
-                    else if(name.equalsIgnoreCase("DisallowOverscroll"))
-                    {
-                        boolean value = xml.getAttributeValue(null, "value").equals("true");
-                        action.getIntent().putExtra(name, value);
-                    }
-                    else if(name.equalsIgnoreCase("errorurl"))
-                    {
-                        errorUrl = xml.getAttributeValue(null, "value");
-                    }
-                    else
-                    {
-                        String value = xml.getAttributeValue(null, "value");
-                        action.getIntent().putExtra(name, value);
-                    }
-                    /*
-                    LOG.i("CordovaLog", "Found preference for %s=%s", name, value);
-                     */
+                    String name = xml.getAttributeValue(null, "name").toLowerCase(Locale.ENGLISH);
+                    String value = xml.getAttributeValue(null, "value");
+                    prefs.set(name, value);
                 }
                 else if (strNode.equals("content")) {
                     String src = xml.getAttributeValue(null, "src");
@@ -200,6 +142,10 @@ public class Config {
                 e.printStackTrace();
             }
         }
+    }
+    
+    public static CordovaPreferences getPreferences() {
+        return prefs;
     }
 
     /**
