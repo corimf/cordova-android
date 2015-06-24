@@ -92,6 +92,8 @@ public class CordovaWebView extends WebView {
 
     NativeToJsMessageQueue jsMessageQueue;
     ExposedJsApi exposedJsApi;
+    
+    private CordovaPreferences preferences;
 
     /** custom view created by the browser (a video player for example) */
     private View mCustomView;
@@ -373,7 +375,7 @@ public class CordovaWebView extends WebView {
         // Create a timeout timer for loadUrl
         final CordovaWebView me = this;
         final int currentLoadUrlTimeout = me.loadUrlTimeout;
-        final int loadUrlTimeoutValue = Integer.parseInt(this.getProperty("loadUrlTimeoutValue", "20000"));
+        final int loadUrlTimeoutValue = preferences.getInteger("LoadUrlTimeoutValue", 20000);
 
         // Timeout error method
         final Runnable loadError = new Runnable() {
@@ -616,37 +618,20 @@ public class CordovaWebView extends WebView {
      *      <log level="DEBUG" />
      */
     private void loadConfiguration() {
+        preferences = Config.getPreferences();
+        
         // Config has already been loaded, and it stores these preferences on the Intent.
-        if("false".equals(this.getProperty("useBrowserHistory", "true")))
+        if(!preferences.getBoolean("useBrowserHistory", true))
         {
             //Switch back to the old browser history and state the six month policy
             this.useBrowserHistory = false;
             Log.w(TAG, "useBrowserHistory=false is deprecated as of Cordova 2.2.0 and will be removed six months after the 2.2.0 release.  Please use the browser history and use history.back().");
         }
  
-        if ("true".equals(this.getProperty("fullscreen", "false"))) {
+        if (preferences.getBoolean("Fullscreen", false)) {
             this.cordova.getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
             this.cordova.getActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         }
-    }
-
-    /**
-     * Get string property for activity.
-     *
-     * @param name
-     * @param defaultValue
-     * @return
-     */
-    public String getProperty(String name, String defaultValue) {
-        Bundle bundle = this.cordova.getActivity().getIntent().getExtras();
-        if (bundle == null) {
-            return defaultValue;
-        }
-        Object p = bundle.get(name);
-        if (p == null) {
-            return defaultValue;
-        }
-        return p.toString();
     }
 
     /*

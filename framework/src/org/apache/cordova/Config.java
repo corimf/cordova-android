@@ -47,6 +47,8 @@ public class Config {
     private static String errorUrl;
 
     private static Config self = null;
+    
+    public static CordovaPreferences prefs = new CordovaPreferences();
 
     public static void init(Activity action) {
         if (self == null) {
@@ -112,20 +114,9 @@ public class Config {
                     }
                 }
                 else if (strNode.equals("preference")) {
-                    String name = xml.getAttributeValue(null, "name");
-
-                    // Mike: Our 2.3.esr never backported 80b369d6d, which split this preference logic
-                    // into pulling out values for specific preferences due to data types
-                    if(name.equalsIgnoreCase("errorurl")){
-                        errorUrl = xml.getAttributeValue(null, "value");
-                    }else{
-                        String value = xml.getAttributeValue(null, "value");
-                        action.getIntent().putExtra(name, value);
-                    }
-                    
-                    //LOG.i("CordovaLog", "Found preference for %s=%s", name, value);
-                    //Log.d("CordovaLog", "Found preference for " + name + "=" + value);
-
+                    String name = xml.getAttributeValue(null, "name").toLowerCase(Locale.ENGLISH);
+                    String value = xml.getAttributeValue(null, "value");
+                    prefs.set(name, value);
                 }
                 else if (strNode.equals("content")) {
                     String src = xml.getAttributeValue(null, "src");
@@ -156,6 +147,10 @@ public class Config {
                 e.printStackTrace();
             }
         }
+    }
+    
+    public static CordovaPreferences getPreferences() {
+        return prefs;
     }
 
     /**
