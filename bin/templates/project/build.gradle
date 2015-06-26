@@ -1,6 +1,6 @@
 import java.util.regex.Pattern
 
-apply plugin: 'android'
+apply plugin: 'com.android.application'
 
 buildscript {
     repositories {
@@ -8,7 +8,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:0.10.+'
+        classpath 'com.android.tools.build:gradle:1.2.3'
     }
 }
 
@@ -39,7 +39,7 @@ android {
     }
 
     compileSdkVersion 19
-    buildToolsVersion "19.0.0"
+    buildToolsVersion "19.1.0"
 
     if (multiarch || System.env.BUILD_MULTIPLE_APKS) {
         productFlavors {
@@ -68,10 +68,15 @@ android {
         targetCompatibility JavaVersion.VERSION_1_7
     }
 
+	packagingOptions {
+        pickFirst 'META-INF/ASL2.0'
+        pickFirst 'META-INF/LICENSE'
+        pickFirst 'META-INF/NOTICE'
+    }
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '1.12'
+    gradleVersion = '2.2.1'
 }
 
 def getVersionCodeFromManifest() {
