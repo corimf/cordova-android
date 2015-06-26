@@ -1,0 +1,16 @@
+{
+  "name": "cordova-android",
+  "version": "3.6.4",
+  "dependencies": {
+    "q": {
+      "version": "0.9.7",
+      "from": "q@^0.9.0",
+      "resolved": "https://registry.npmjs.org/q/-/q-0.9.7.tgz"
+    },
+    "shelljs": {
+      "version": "0.2.6",
+      "from": "shelljs@^0.2.6",
+      "resolved": "https://registry.npmjs.org/shelljs/-/shelljs-0.2.6.tgz"
+    }
+  }
+}
