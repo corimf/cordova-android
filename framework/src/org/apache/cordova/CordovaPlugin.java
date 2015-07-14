@@ -26,6 +26,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 
 /**
@@ -37,6 +38,7 @@ public class CordovaPlugin {
     public CordovaWebView webView;
     public CordovaInterface cordova;
     protected CordovaPreferences preferences;
+    private String [] permissions;
 
     /**
      * Call this after constructing to initialize the plugin.
@@ -64,7 +66,7 @@ public class CordovaPlugin {
      */
     protected void pluginInitialize() {
     }
-    
+
     /**
      * Executes the request.
      *
@@ -188,7 +190,7 @@ public class CordovaPlugin {
     public Uri remapUri(Uri uri) {
         return null;
     }
-    
+
     /**
      * Called when the WebView does a top-level navigation or refreshes.
      *
@@ -197,5 +199,51 @@ public class CordovaPlugin {
      * Does nothing by default.
      */
     public void onReset() {
+    }
+
+    /**
+     * Called by the Plugin Manager when we need to actually request permissions
+     *
+     * @return              Returns the permission that was stored in the plugin
+     */
+
+    public String[] getPermissionRequest() {
+        return permissions;
+    }
+
+    /**
+     * requestPermission
+     */
+    public void requestPermission() {
+        cordova.requestPermission(this);
+    }
+
+    public boolean hasPermisssion() {
+        for(String p : permissions)
+        {
+            if(PackageManager.PERMISSION_DENIED == cordova.getActivity().checkSelfPermission(p))
+            {
+                return false;
+            }
+        }
+    }
+
+    /**
+     * Called by the system when the user grants permissions
+     *
+     * @param requestCode
+     * @param permissions
+     * @param grantResults
+     */
+    public boolean onRequestPermissionResult(int requestCode, String[] permissions,
+                                          int[] grantResults) {
+
+        for(int r:grantResults)
+        {
+            if(r == PackageManager.PERMISSION_DENIED)
+                return false;
+        }
+
+        return true;
     }
 }
