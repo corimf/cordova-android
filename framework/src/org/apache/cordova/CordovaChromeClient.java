@@ -64,10 +64,10 @@ public class CordovaChromeClient extends WebChromeClient {
 
     // the video progress view
     private View mVideoProgressView;
-    
+
     // File Chooser
     public ValueCallback<Uri> mUploadMessage;
-    
+
     @Deprecated
     public CordovaChromeClient(CordovaInterface cordova) {
         this.cordova = cordova;
@@ -259,14 +259,23 @@ public class CordovaChromeClient extends WebChromeClient {
     /**
      * Instructs the client to show a prompt to ask the user to set the Geolocation permission state for the specified origin.
      *
+     * This also checks for the Geolocation Plugin and requests permission from the application  to use Geolocation.
+     *
      * @param origin
      * @param callback
      */
     public void onGeolocationPermissionsShowPrompt(String origin, Callback callback) {
         super.onGeolocationPermissionsShowPrompt(origin, callback);
         callback.invoke(origin, true, false);
+        //Get the plugin, it should be loaded
+        CordovaPlugin geolocation = this.appView.pluginManager.getPlugin("org.apache.cordova.geolocation.PermissionHandler");
+        if(geolocation != null && !geolocation.hasPermisssion())
+        {
+            this.appView.pluginManager.requestPermission(geolocation);
+        }
+
     }
-    
+
     // API level 7 is required for this, see if we could lower this using something else
     @Override
     public void onShowCustomView(View view, WebChromeClient.CustomViewCallback callback) {
@@ -277,7 +286,7 @@ public class CordovaChromeClient extends WebChromeClient {
     public void onHideCustomView() {
         this.appView.hideCustomView();
     }
-    
+
     @Override
     /**
      * Ask the host application for a custom progress view to show while
@@ -286,9 +295,9 @@ public class CordovaChromeClient extends WebChromeClient {
      */
     public View getVideoLoadingProgressView() {
 
-        if (mVideoProgressView == null) {            
+        if (mVideoProgressView == null) {
             // Create a new Loading view programmatically.
-            
+
             // create the linear layout
             LinearLayout layout = new LinearLayout(this.appView.getContext());
             layout.setOrientation(LinearLayout.VERTICAL);
@@ -299,14 +308,14 @@ public class CordovaChromeClient extends WebChromeClient {
             ProgressBar bar = new ProgressBar(this.appView.getContext());
             LinearLayout.LayoutParams barLayoutParams = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
             barLayoutParams.gravity = Gravity.CENTER;
-            bar.setLayoutParams(barLayoutParams);   
+            bar.setLayoutParams(barLayoutParams);
             layout.addView(bar);
-            
+
             mVideoProgressView = layout;
         }
-    return mVideoProgressView; 
+    return mVideoProgressView;
     }
-    
+
     public void openFileChooser(ValueCallback<Uri> uploadMsg) {
         this.openFileChooser(uploadMsg, "*/*");
     }
@@ -314,7 +323,7 @@ public class CordovaChromeClient extends WebChromeClient {
     public void openFileChooser( ValueCallback<Uri> uploadMsg, String acceptType ) {
         this.openFileChooser(uploadMsg, acceptType, null);
     }
-    
+
     public void openFileChooser(ValueCallback<Uri> uploadMsg, String acceptType, String capture)
     {
         mUploadMessage = uploadMsg;
@@ -324,7 +333,7 @@ public class CordovaChromeClient extends WebChromeClient {
         this.cordova.getActivity().startActivityForResult(Intent.createChooser(i, "File Browser"),
                 FILECHOOSER_RESULTCODE);
     }
-    
+
     public ValueCallback<Uri> getValueCallback() {
         return this.mUploadMessage;
     }
