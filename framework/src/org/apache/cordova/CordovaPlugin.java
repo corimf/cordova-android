@@ -38,7 +38,7 @@ public class CordovaPlugin {
     public CordovaWebView webView;
     public CordovaInterface cordova;
     protected CordovaPreferences preferences;
-    private String [] permissions;
+    protected String [] permissions;
 
     /**
      * Call this after constructing to initialize the plugin.
@@ -226,6 +226,8 @@ public class CordovaPlugin {
                 return false;
             }
         }
+
+        return true;
     }
 
     /**
