@@ -26,6 +26,7 @@ import java.util.Iterator;
 import java.util.Stack;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.Locale;
 
 import org.apache.cordova.api.CordovaInterface;
 import org.apache.cordova.api.LOG;
@@ -98,6 +99,8 @@ public class CordovaWebView extends WebView {
 
 	NativeToJsMessageQueue jsMessageQueue;
 	ExposedJsApi exposedJsApi;
+    
+    public static CordovaPreferences preferences = new CordovaPreferences();
 
     /** custom view created by the browser (a video player for example) */
     private View mCustomView;
@@ -433,7 +436,7 @@ public class CordovaWebView extends WebView {
         // Create a timeout timer for loadUrl
         final CordovaWebView me = this;
         final int currentLoadUrlTimeout = me.loadUrlTimeout;
-        final int loadUrlTimeoutValue = Integer.parseInt(this.getProperty("loadUrlTimeoutValue", "20000"));
+        final int loadUrlTimeoutValue = preferences.getInteger("LoadUrlTimeoutValue", 20000);
 
         // Timeout error method
         final Runnable loadError = new Runnable() {
@@ -705,14 +708,13 @@ public class CordovaWebView extends WebView {
                     }
                 }
                 else if (strNode.equals("preference")) {
-                    String name = xml.getAttributeValue(null, "name");
+                    String name = xml.getAttributeValue(null, "name").toLowerCase(Locale.ENGLISH);
                     String value = xml.getAttributeValue(null, "value");
 
                     LOG.i("CordovaLog", "Found preference for %s=%s", name, value);
                     Log.d("CordovaLog", "Found preference for " + name + "=" + value);
 
-                    // Save preferences in Intent
-                    this.cordova.getActivity().getIntent().putExtra(name, value);
+                    preferences.set(name, value);
                 }
             }
             try {
@@ -724,36 +726,21 @@ public class CordovaWebView extends WebView {
             }
         }
 
-        if("false".equals(this.getProperty("useBrowserHistory", "true")))
+        if(!preferences.getBoolean("useBrowserHistory", true))
         {
             //Switch back to the old browser history and state the six month policy
             this.useBrowserHistory = false;
             Log.w(TAG, "useBrowserHistory=false is deprecated as of Cordova 2.2.0 and will be removed six months after the 2.2.0 release.  Please use the browser history and use history.back().");
         }
  
-        if ("true".equals(this.getProperty("fullscreen", "false"))) {
+        if (preferences.getBoolean("Fullscreen", false)) {
             this.cordova.getActivity().getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
             this.cordova.getActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         }
     }
-
-    /**
-     * Get string property for activity.
-     *
-     * @param name
-     * @param defaultValue
-     * @return
-     */
-    public String getProperty(String name, String defaultValue) {
-        Bundle bundle = this.cordova.getActivity().getIntent().getExtras();
-        if (bundle == null) {
-            return defaultValue;
-        }
-        Object p = bundle.get(name);
-        if (p == null) {
-            return defaultValue;
-        }
-        return p.toString();
+    
+    public static CordovaPreferences getPreferences() {
+        return preferences;
     }
 
     /*
