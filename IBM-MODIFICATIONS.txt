@@ -1,3 +1,17 @@
+Fix Filereader returning FileNotFoundException
+- Cordova RTC work item number: 81748
+- Apache Cordova Jira issue: 
+- Markmail or Google Group reference:
+- Product PMR: APAR PI44703 (RTC 80983)
+- Full description: Using the native filereader, the user is not able to display an 
+image after selecting an image. The filereader returns an error FileNotFoundException. 
+This started happening after a cherry-pick for refactoring the whitelist to make it
+more restrictive (commit 910203776393bea65fd26ba1437c41898a641ccf). After some 
+investigation, it was discovered that the Filereader returns a blob object, rather
+than a file, and with the newly restrictive whitelist, blobs were not allowed. To 
+fix, must specify that blobs are allowed in the whitelist. This does not happen on 
+later versions of cordova. 
+
 Security Vulnerability Patch for Exploiting Intents
 
 - Cordova RTC work item number: 75631

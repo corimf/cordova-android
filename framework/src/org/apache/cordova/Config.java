@@ -83,6 +83,7 @@ public class Config {
         internalWhitelist.addWhiteListEntry("file:///*", false);
         internalWhitelist.addWhiteListEntry("content:///*", false);
         internalWhitelist.addWhiteListEntry("data:*", false);
+        internalWhitelist.addWhiteListEntry("blob:*", false);
 
         XmlResourceParser xml = action.getResources().getXml(id);
         int eventType = -1;
