@@ -1,5 +1,5 @@
 // Platform: android
-// 8ca0f3b2b87e0759c5236b91c80f18438544409c
+// 0231b1f3e7d3ebb1e23d2103dfd8f25609a1414b
 /*
  Licensed to the Apache Software Foundation (ASF) under one
  or more contributor license agreements.  See the NOTICE file
@@ -263,11 +263,7 @@ var cordova = {
      * Called by native code when returning successful result from an action.
      */
     callbackSuccess: function(callbackId, args) {
-        try {
-            cordova.callbackFromNative(callbackId, true, args.status, [args.message], args.keepCallback);
-        } catch (e) {
-            console.log("Error in success callback: " + callbackId + " = "+e);
-        }
+        cordova.callbackFromNative(callbackId, true, args.status, [args.message], args.keepCallback);
     },
 
     /**
@@ -276,29 +272,33 @@ var cordova = {
     callbackError: function(callbackId, args) {
         // TODO: Deprecate callbackSuccess and callbackError in favour of callbackFromNative.
         // Derive success from status.
-        try {
-            cordova.callbackFromNative(callbackId, false, args.status, [args.message], args.keepCallback);
-        } catch (e) {
-            console.log("Error in error callback: " + callbackId + " = "+e);
-        }
+        cordova.callbackFromNative(callbackId, false, args.status, [args.message], args.keepCallback);
     },
 
     /**
      * Called by native code when returning the result from an action.
      */
-    callbackFromNative: function(callbackId, success, status, args, keepCallback) {
-        var callback = cordova.callbacks[callbackId];
-        if (callback) {
-            if (success && status == cordova.callbackStatus.OK) {
-                callback.success && callback.success.apply(null, args);
-            } else if (!success) {
-                callback.fail && callback.fail.apply(null, args);
-            }
+    callbackFromNative: function(callbackId, isSuccess, status, args, keepCallback) {
+        try {
+            var callback = cordova.callbacks[callbackId];
+            if (callback) {
+                if (isSuccess && status == cordova.callbackStatus.OK) {
+                    callback.success && callback.success.apply(null, args);
+                } else {
+                    callback.fail && callback.fail.apply(null, args);
+                }
 
-            // Clear callback if not expecting any more results
-            if (!keepCallback) {
-                delete cordova.callbacks[callbackId];
+                // Clear callback if not expecting any more results
+                if (!keepCallback) {
+                    delete cordova.callbacks[callbackId];
+                }
             }
+        }
+        catch (err) {
+            var msg = "Error in " + (isSuccess ? "Success" : "Error") + " callbackId: " + callbackId + " : " + err;
+            console && console.log && console.log(msg);
+            cordova.fireWindowEvent("cordovacallbackerror", { 'message': msg });
+            throw err;
         }
     },
     addConstructor: function(func) {
@@ -509,9 +509,14 @@ function each(objects, func, context) {
 
 function clobber(obj, key, value) {
     exports.replaceHookForTesting(obj, key);
-    obj[key] = value;
+    var needsProperty = false;
+    try {
+        obj[key] = value;
+    } catch (e) {
+        needsProperty = true;
+    }
     // Getters can only be overridden by getters.
-    if (obj[key] !== value) {
+    if (needsProperty || obj[key] !== value) {
         utils.defineGetter(obj, key, function() {
             return value;
         });
@@ -1013,6 +1018,42 @@ androidExec.setNativeToJsBridgeMode = function(mode) {
     }
 };
 
+function buildPayload(payload, message) {
+    var payloadKind = message.charAt(0);
+    if (payloadKind == 's') {
+        payload.push(message.slice(1));
+    } else if (payloadKind == 't') {
+        payload.push(true);
+    } else if (payloadKind == 'f') {
+        payload.push(false);
+    } else if (payloadKind == 'N') {
+        payload.push(null);
+    } else if (payloadKind == 'n') {
+        payload.push(+message.slice(1));
+    } else if (payloadKind == 'A') {
+        var data = message.slice(1);
+        var bytes = window.atob(data);
+        var arraybuffer = new Uint8Array(bytes.length);
+        for (var i = 0; i < bytes.length; i++) {
+            arraybuffer[i] = bytes.charCodeAt(i);
+        }
+        payload.push(arraybuffer.buffer);
+    } else if (payloadKind == 'S') {
+        payload.push(window.atob(message.slice(1)));
+    } else if (payloadKind == 'M') {
+        var multipartMessages = message.slice(1);
+        while (multipartMessages !== "") {
+            var spaceIdx = multipartMessages.indexOf(' ');
+            var msgLen = +multipartMessages.slice(0, spaceIdx);
+            var multipartMessage = multipartMessages.substr(spaceIdx + 1, msgLen);
+            multipartMessages = multipartMessages.slice(spaceIdx + msgLen + 1);
+            buildPayload(payload, multipartMessage);
+        }
+    } else {
+        payload.push(JSON.parse(message));
+    }
+}
+
 // Processes a single message, as encoded by NativeToJsMessageQueue.java.
 function processMessage(message) {
     try {
@@ -1026,32 +1067,10 @@ function processMessage(message) {
             var status = +message.slice(2, spaceIdx);
             var nextSpaceIdx = message.indexOf(' ', spaceIdx + 1);
             var callbackId = message.slice(spaceIdx + 1, nextSpaceIdx);
-            var payloadKind = message.charAt(nextSpaceIdx + 1);
-            var payload;
-            if (payloadKind == 's') {
-                payload = message.slice(nextSpaceIdx + 2);
-            } else if (payloadKind == 't') {
-                payload = true;
-            } else if (payloadKind == 'f') {
-                payload = false;
-            } else if (payloadKind == 'N') {
-                payload = null;
-            } else if (payloadKind == 'n') {
-                payload = +message.slice(nextSpaceIdx + 2);
-            } else if (payloadKind == 'A') {
-                var data = message.slice(nextSpaceIdx + 2);
-                var bytes = window.atob(data);
-                var arraybuffer = new Uint8Array(bytes.length);
-                for (var i = 0; i < bytes.length; i++) {
-                    arraybuffer[i] = bytes.charCodeAt(i);
-                }
-                payload = arraybuffer.buffer;
-            } else if (payloadKind == 'S') {
-                payload = window.atob(message.slice(nextSpaceIdx + 2));
-            } else {
-                payload = JSON.parse(message.slice(nextSpaceIdx + 1));
-            }
-            cordova.callbackFromNative(callbackId, success, status, [payload], keepCallback);
+            var payloadMessage = message.slice(nextSpaceIdx + 1);
+            var payload = [];
+            buildPayload(payload, payloadMessage);
+            cordova.callbackFromNative(callbackId, success, status, payload, keepCallback);
         } else {
             console.log("processMessage failed: invalid message: " + JSON.stringify(message));
         }
@@ -1153,6 +1172,7 @@ var cordova = require('cordova');
 var modulemapper = require('cordova/modulemapper');
 var platform = require('cordova/platform');
 var pluginloader = require('cordova/pluginloader');
+var utils = require('cordova/utils');
 
 var platformInitChannelsArray = [channel.onNativeReady, channel.onPluginsReady];
 
@@ -1184,21 +1204,19 @@ function replaceNavigator(origNavigator) {
         for (var key in origNavigator) {
             if (typeof origNavigator[key] == 'function') {
                 newNavigator[key] = origNavigator[key].bind(origNavigator);
-            } else {
+            } 
+            else {
                 (function(k) {
-                        Object.defineProperty(newNavigator, k, {
-                            get: function() {
-                                return origNavigator[k];
-                            },
-                            configurable: true,
-                            enumerable: true
-                        });
-                    })(key);
+                    utils.defineGetterSetter(newNavigator,key,function() {
+                        return origNavigator[k];
+                    });
+                })(key);
             }
         }
     }
     return newNavigator;
 }
+
 if (window.navigator) {
     window.navigator = replaceNavigator(window.navigator);
 }
@@ -1279,6 +1297,7 @@ define("cordova/init_b", function(require, exports, module) {
 var channel = require('cordova/channel');
 var cordova = require('cordova');
 var platform = require('cordova/platform');
+var utils = require('cordova/utils');
 
 var platformInitChannelsArray = [channel.onDOMContentLoaded, channel.onNativeReady];
 
@@ -1313,16 +1332,13 @@ function replaceNavigator(origNavigator) {
         for (var key in origNavigator) {
             if (typeof origNavigator[key] == 'function') {
                 newNavigator[key] = origNavigator[key].bind(origNavigator);
-            } else {
+            } 
+            else {
                 (function(k) {
-                        Object.defineProperty(newNavigator, k, {
-                            get: function() {
-                                return origNavigator[k];
-                            },
-                            configurable: true,
-                            enumerable: true
-                        });
-                    })(key);
+                    utils.defineGetterSetter(newNavigator,key,function() {
+                        return origNavigator[k];
+                    });
+                })(key);
             }
         }
     }
