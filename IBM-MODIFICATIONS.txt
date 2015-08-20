@@ -1,3 +1,20 @@
+Update min SDK version to 14, and set target SDK version to 22
+
+- Cordova RTC work item number: 
+- Apache Cordova Jira issue: https://issues.apache.org/jira/browse/CB-8894,
+https://issues.apache.org/jira/browse/CB-8829
+- Markmail / Google Group / StackOverflow reference: 
+- IBM PMR: 
+- Worklight RTC work item number: (APAR) 85593 
+- Cherry-pick: a0293578b1a6bd4241ba2fa0d6b13cc4e6c4096e, 
+e4678f47090702558fa939af680d77d0e30f39d1, 6d334c05e95b9d2a930b39afc9fd45a3d509e672
+- Full description:  When users setup the Android SDK for the first time, the default 
+SDK version that is installed is 22. MobileFirst Platform Foundation Command Line for 
+Cordova requires that the user be using version 19. This results in an error, and the 
+user is then forced to download an older Android SDK version to fix the issue. The result 
+here is a negative experience for the user.
+
+
 Update cordova.js snapshot
 
 - Cordova RTC work item number: 84893
