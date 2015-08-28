@@ -136,6 +136,8 @@ public class CordovaActivity extends Activity implements CordovaInterface {
     protected String launchUrl;
     protected ArrayList<PluginEntry> pluginEntries;
 
+    protected CordovaPlugin permissionResultCallback;
+
     /**
     * Sets the authentication token.
     *
@@ -1048,13 +1050,39 @@ public class CordovaActivity extends Activity implements CordovaInterface {
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[],
                                            int[] grantResults) {
-        PluginManager pm = this.appView.pluginManager;
-        pm.onRequestPermissionResult(requestCode, permissions, grantResults);
+        onRequestPermissionResult(requestCode, permissions, grantResults);
     }
 
-    public void requestPermission(CordovaPlugin plugin)
+    /**
+     * Called by the system when the user grants permissions
+     *
+     * @param requestCode
+     * @param permissions
+     * @param grantResults
+     */
+    public void onRequestPermissionResult(int requestCode, String[] permissions,
+                                          int[] grantResults) {
+        if(permissionResultCallback != null)
+        {
+            permissionResultCallback.onRequestPermissionResult(requestCode, permissions, grantResults);
+            permissionResultCallback = null;
+        }
+    }
+
+    public void requestPermission(CordovaPlugin plugin, String permission) {
+        permissionResultCallback = plugin;
+        String[] permissions = new String [1];
+        permissions[0] = permission;
+        int requestCode = 1;
+        getActivity().requestPermissions(permissions, requestCode);
+    }
+
+    public void requestPermissions(CordovaPlugin plugin)
     {
-        this.appView.pluginManager.requestPermission(plugin);
+        permissionResultCallback = plugin;
+        String[] permissions = plugin.getPermissionRequest();
+        int requestCode = 1;
+        getActivity().requestPermissions(permissions, requestCode);
     }
 
 }
