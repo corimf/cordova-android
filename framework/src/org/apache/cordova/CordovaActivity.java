@@ -1050,7 +1050,15 @@ public class CordovaActivity extends Activity implements CordovaInterface {
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[],
                                            int[] grantResults) {
-        onRequestPermissionResult(requestCode, permissions, grantResults);
+        try
+        {
+           onRequestPermissionResult(requestCode, permissions, grantResults);
+        }
+        catch (JSONException e)
+        {
+           LOG.d(TAG, "JSONException: Parameters fed into the method are not valid");
+           e.printStackTrace();
+        }
     }
 
     /**
@@ -1061,7 +1069,7 @@ public class CordovaActivity extends Activity implements CordovaInterface {
      * @param grantResults
      */
     public void onRequestPermissionResult(int requestCode, String[] permissions,
-                                          int[] grantResults) {
+                                          int[] grantResults) throws JSONException {
         if(permissionResultCallback != null)
         {
             permissionResultCallback.onRequestPermissionResult(requestCode, permissions, grantResults);
@@ -1069,19 +1077,17 @@ public class CordovaActivity extends Activity implements CordovaInterface {
         }
     }
 
-    public void requestPermission(CordovaPlugin plugin, String permission) {
+    public void requestPermission(CordovaPlugin plugin, int requestCode, String permission) {
         permissionResultCallback = plugin;
         String[] permissions = new String [1];
         permissions[0] = permission;
-        int requestCode = 1;
         getActivity().requestPermissions(permissions, requestCode);
     }
 
-    public void requestPermissions(CordovaPlugin plugin)
+    public void requestPermissions(CordovaPlugin plugin, int requestCode)
     {
         permissionResultCallback = plugin;
         String[] permissions = plugin.getPermissionRequest();
-        int requestCode = 1;
         getActivity().requestPermissions(permissions, requestCode);
     }
 

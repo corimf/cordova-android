@@ -24,6 +24,7 @@ import org.apache.cordova.LOG;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.view.Gravity;
@@ -65,6 +66,8 @@ public class CordovaChromeClient extends WebChromeClient {
     // the video progress view
     private View mVideoProgressView;
 
+    private Context appContext;
+
     // File Chooser
     public ValueCallback<Uri> mUploadMessage;
 
@@ -76,6 +79,7 @@ public class CordovaChromeClient extends WebChromeClient {
     public CordovaChromeClient(CordovaInterface ctx, CordovaWebView app) {
         this.cordova = ctx;
         this.appView = app;
+        this.appContext = this.appView.getContext();
     }
 
     @Deprecated
@@ -271,7 +275,7 @@ public class CordovaChromeClient extends WebChromeClient {
         CordovaPlugin geolocation = this.appView.pluginManager.getPlugin("Geolocation");
         if(geolocation != null && !geolocation.hasPermisssion())
         {
-            this.appView.pluginManager.requestPermission(geolocation);
+            //cordova.requestPermissions(geolocation);
         }
 
     }
