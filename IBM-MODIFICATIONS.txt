@@ -1,3 +1,20 @@
+Patch security vulnerabilty for headers accepting non-ASCII text
+
+- Apache Cordova Jira issue: https://issues.apache.org/jira/browse/CB-9562
+- Markmail / Google Group / StackOverflow reference: 
+- Worklight RTC work item number: (APAR) 86704
+- Cherry-pick: 5cfc7da8119512dee97a98639ebff4f07321a29b, 
+77305c2b8a6e74929025b9e8184697edf4c7eeeb
+- CVE-2015-5204
+- Full description:  For Android applications that allow HTTP headers to be 
+set by the File Transfer plugin, the file being uploaded can manipulate the
+header through non-ASCII text in the filename. This allows for for cookies to 
+be forged by the Cordova application, or for the file payload to be replaced 
+in some situations. Remotely hosted applications and applications developed 
+with Cordova that allow the user to manually enter the filename are especially 
+vulnerable to this issue. The solution is to limit the characters in the headers 
+to just ASCII text.
+
 Security Vulnerability Patch for Exploiting Intents
 
 - Cordova RTC work item number: 75631
