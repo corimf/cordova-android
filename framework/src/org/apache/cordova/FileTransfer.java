@@ -269,12 +269,32 @@ public class FileTransfer extends CordovaPlugin {
                     if (headers != null) {
                         try {
                             for (Iterator<?> iter = headers.keys(); iter.hasNext(); ) {
+                                /* RFC 2616 says that non-ASCII characters and control
+                                 * characters are not allowed in header names or values.
+                                 * Additionally, spaces are not allowed in header names.
+                                 * RFC 2046 Quoted-printable encoding may be used to encode
+                                 * arbitrary characters, but we donon- not do that encoding here.
+                                 */
                                 String headerKey = iter.next().toString();
+                                headerKey = headerKey.replaceAll("\\n","")
+                                        .replaceAll("\\s+","")
+                                        .replaceAll("[^\\x20-\\x7E]+", "");
+
                                 JSONArray headerValues = headers.optJSONArray(headerKey);
                                 if (headerValues == null) {
                                     headerValues = new JSONArray();
-                                    headerValues.put(headers.getString(headerKey));
+
+                                     /* RFC 2616 also says that any amount of consecutive linear
+                                      * whitespace within a header value can be replaced with a
+                                      * single space character, without affecting the meaning of
+                                      * that value.
+                                      */
+
+                                    String headerValue = headers.getString(headerKey);
+                                     String finalValue = headerValue.replaceAll("\\s+", " ").replaceAll("\\n"," ").replaceAll("[^\\x20-\\x7E]+", " ");
+                                    headerValues.put(finalValue);
                                 }
+
                                 conn.setRequestProperty(headerKey, headerValues.getString(0));
                                 for (int i = 1; i < headerValues.length(); ++i) {
                                     conn.addRequestProperty(headerKey, headerValues.getString(i));
