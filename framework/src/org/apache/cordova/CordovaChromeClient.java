@@ -275,7 +275,7 @@ public class CordovaChromeClient extends WebChromeClient {
         CordovaPlugin geolocation = this.appView.pluginManager.getPlugin("Geolocation");
         if(geolocation != null && !geolocation.hasPermisssion())
         {
-            //cordova.requestPermissions(geolocation);
+            geolocation.cordova.requestPermissions(geolocation, 0);
         }
 
     }
