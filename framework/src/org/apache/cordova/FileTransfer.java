@@ -276,8 +276,9 @@ public class FileTransfer extends CordovaPlugin {
                                  * arbitrary characters, but we donon- not do that encoding here.
                                  */
                                 String headerKey = iter.next().toString();
-                                headerKey = headerKey.replaceAll("\\n","")
+                                String cleanHeaderKey = headerKey.replaceAll("\\n","")
                                         .replaceAll("\\s+","")
+                                        .replaceAll(":", "")
                                         .replaceAll("[^\\x20-\\x7E]+", "");
 
                                 JSONArray headerValues = headers.optJSONArray(headerKey);
@@ -295,7 +296,8 @@ public class FileTransfer extends CordovaPlugin {
                                     headerValues.put(finalValue);
                                 }
 
-                                conn.setRequestProperty(headerKey, headerValues.getString(0));
+                                //Use the clean header key, not the one that we passed in
+                                conn.setRequestProperty(cleanHeaderKey, headerValues.getString(0));
                                 for (int i = 1; i < headerValues.length(); ++i) {
                                     conn.addRequestProperty(headerKey, headerValues.getString(i));
                                 }

@@ -4,7 +4,8 @@ Patch security vulnerabilty for headers accepting non-ASCII text
 - Markmail / Google Group / StackOverflow reference: 
 - Worklight RTC work item number: (APAR) 86704
 - Cherry-pick: 5cfc7da8119512dee97a98639ebff4f07321a29b, 
-77305c2b8a6e74929025b9e8184697edf4c7eeeb
+77305c2b8a6e74929025b9e8184697edf4c7eeeb, 8fcdb1aa3deb892691b44bdf57e8d780da09e2a4,
+a4a448095c02a658c2e1fdcff267d5d3de5785f3
 - CVE-2015-5204
 - Full description:  For Android applications that allow HTTP headers to be 
 set by the File Transfer plugin, the file being uploaded can manipulate the
