@@ -29,6 +29,7 @@ import org.apache.cordova.LOG;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -37,6 +38,8 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.graphics.Color;
 import android.media.AudioManager;
 import android.net.Uri;
@@ -1084,11 +1087,24 @@ public class CordovaActivity extends Activity implements CordovaInterface {
         getActivity().requestPermissions(permissions, requestCode);
     }
 
-    public void requestPermissions(CordovaPlugin plugin, int requestCode)
+    public void requestPermissions(CordovaPlugin plugin, int requestCode, String [] permissions)
     {
         permissionResultCallback = plugin;
-        String[] permissions = plugin.getPermissionRequest();
         getActivity().requestPermissions(permissions, requestCode);
     }
+
+    public boolean hasPermission(String permission)
+    {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+        {
+            int result = checkSelfPermission(permission);
+            return PackageManager.PERMISSION_GRANTED == result;
+        }
+        else
+        {
+            return true;
+        }
+    }
+
 
 }
