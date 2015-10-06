@@ -39,7 +39,6 @@ public class CordovaPlugin {
     public CordovaWebView webView;
     public CordovaInterface cordova;
     protected CordovaPreferences preferences;
-    protected String [] permissions;
 
     /**
      * Call this after constructing to initialize the plugin.
@@ -211,7 +210,6 @@ public class CordovaPlugin {
      */
 
     public void requestPermissions(int requestCode) {
-        cordova.requestPermissions(this, requestCode, permissions);
     }
 
     /*
@@ -222,18 +220,6 @@ public class CordovaPlugin {
      */
 
     public boolean hasPermisssion() {
-        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.M)
-        {
-            return true;
-        }
-        for(String p : permissions)
-        {
-            if(PackageManager.PERMISSION_DENIED == cordova.getActivity().checkSelfPermission(p))
-            {
-                return false;
-            }
-        }
-
         return true;
     }
 
