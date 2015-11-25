@@ -1,3 +1,19 @@
+Fixed Weak Randomization of BridgeSecret for Apache Cordova Android Vulnerability
+
+- Cordova RTC work item number: 
+- Apache Cordova Jira issue: 
+- Markmail / Google Group / StackOverflow reference: 
+- IBM PMR: 
+- Worklight RTC work item number: (APAR) 94881
+- Cherry-pick: b37498d5f61faf37c5cbe7ca58f004ceacdffb0f, 
+16343ffe7009dca68af77a53cebb90e76d6a9fe3, 53dae454308d6a0d03c653f85b330d4678290fab
+- Full description:  Cordova uses a bridge that allows the Native Application to 
+communicate with the HTML and Javascript that control the user interface. To protect 
+this bridge on Android, the framework uses a BridgeSecret to protect it from 
+third-party hijacking. However, the BridgeSecret is not sufficiently random and can 
+be determined in certain scenarios. Using a secure randomization function will 
+ensure that the BridgeSecret is better randomized and secure. 
+
 Update min SDK version to 14, and set target SDK version to 22
 
 - Cordova RTC work item number: 
