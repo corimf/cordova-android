@@ -817,7 +817,7 @@ public class CordovaWebView extends WebView {
    
     }
     
-    public void handleResume(boolean keepRunning, boolean activityResultKeepRunning)
+    public void handleResume(boolean keepRunning)
     {
 
         this.loadUrl("javascript:try{cordova.fireDocumentEvent('resume');}catch(e){console.log('exception firing resume event from native');};");
