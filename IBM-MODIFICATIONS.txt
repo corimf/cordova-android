@@ -1,3 +1,18 @@
+Move requestFocusFromTouch() to be called during createViews()
+
+- Cordova RTC work item number: 
+- Apache Cordova Jira issue: 
+- Markmail / Google Group / StackOverflow reference: 
+- IBM PMR: 31962,999,766 (87879)
+- Worklight RTC work item number: (APAR) 98139
+- Cherry-pick: 
+- Full description: Due to moving createViews() to be called before plugin 
+initialization, the function requestFocusFromTouch() was being called later, and 
+this caused some complication with the focusing of the app if you add a dialog. The 
+button on the dialog would appear as if it is being pressed, thus having focus on 
+startup without user input. Moving that function to be called ealier returned it to 
+the expected behavior. 
+
 Fixed Weak Randomization of BridgeSecret for Apache Cordova Android Vulnerability
 
 - Cordova RTC work item number: 
