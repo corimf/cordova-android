@@ -1,3 +1,16 @@
+Don't Call pauseTimers() in startActivityForResult()
+
+- Cordova RTC work item number: 94380
+- Apache Cordova Jira issue: https://issues.apache.org/jira/browse/CB-7947
+(modified a little)
+- Markmail or Google Group reference:
+- Product PMR: APAR PI52650 (RTC 94380)
+- Full description: Calling pauseTimers() in startActivityForResult() 
+causes major issues to the webview on page load. The page hangs waiting
+to resume, so no JavaScript or anything else gets executed. The activity's
+onPause is already fired, so no need to call pauseTimers from 
+startActivityForResult.
+
 Move requestFocusFromTouch() to be called during createViews()
 
 - Cordova RTC work item number: 
