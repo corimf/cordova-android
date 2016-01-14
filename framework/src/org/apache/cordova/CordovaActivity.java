@@ -280,6 +280,7 @@ public class CordovaActivity extends Activity implements CordovaInterface {
 
         int backgroundColor = preferences.getInteger("BackgroundColor", Color.BLACK);
         root.setBackgroundColor(backgroundColor);
+		appView.requestFocusFromTouch();
     }
 
     /**
