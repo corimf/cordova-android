@@ -4,11 +4,11 @@ apply plugin: 'com.android.application'
 
 buildscript {
     repositories {
-        mavenCentral()
+        jcenter()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.2.3'
+        classpath 'com.android.tools.build:gradle:1.5.0'
     }
 }
 
@@ -38,8 +38,8 @@ android {
         versionCode Integer.parseInt("" + getVersionCodeFromManifest() + "0")
     }
 
-    compileSdkVersion 19
-    buildToolsVersion "19.1.0"
+    compileSdkVersion 22
+    buildToolsVersion "23.0.2"
 
     if (multiarch || System.env.BUILD_MULTIPLE_APKS) {
         productFlavors {
@@ -76,7 +76,7 @@ android {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.2.1'
+    gradleVersion = '2.8'
 }
 
 def getVersionCodeFromManifest() {
