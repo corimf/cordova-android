@@ -770,7 +770,9 @@ public class CordovaWebView extends WebView {
         if (this.pluginManager != null) {
             this.pluginManager.onDestroy();
         }
-        
+
+        this.destroy();
+
         // unregister the receiver
         if (this.receiver != null) {
             try {
