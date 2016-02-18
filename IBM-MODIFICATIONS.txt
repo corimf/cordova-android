@@ -1,3 +1,17 @@
+Destroy Cordova Webview when onDestroyed() is called
+- Cordova RTC work item number: 101382
+- Apache Cordova Jira issue: 
+- Markmail or Google Group reference:
+- Product PMR: APAR PI57332 (RTC 101382)
+- Full description: The Cordova Webview is never destroyed when the application is 
+sent to the background. When the application resumes from the background, a new 
+instance of the webview is created while the old webview is not cleared. The old 
+webview will be cleared when the application is killed or the OS kills it to clear 
+some memory. The Cordova Activity's onDestroy() method never actually destroys the 
+webview, so it causes a problem of multiple leaked webviews in a detatched state. 
+This takes up memory, so it is better to destroy the webview when the application 
+goes to the background. 
+
 Don't Call pauseTimers() in startActivityForResult()
 
 - Cordova RTC work item number: 94380
