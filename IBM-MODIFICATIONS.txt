@@ -1,3 +1,17 @@
+Add Android M permission support to Cordova
+- Cordova RTC work item number: 106363
+- Apache Cordova Jira issue: 
+- Markmail or Google Group reference:
+- Product PMR: APAR PI61332 (RTC 106363)
+- Cherry-pick: 8981ddb681c21eb521562b860c35361291ca09be, 9a339437839f2e245e90353da5fd7b3b8b832325,
+07912fdecd3627332e706497430111c72a30b267, a0747aa960cd906beb3249e3d91443a0ea3e1578,
+5e0c9595c3ff813af6c21a5483926d1225874a7f, 47ac5148357050e182ad54dda02d5c96aa17a60b,
+013ad94af0a9f0d1f4d4a90528308ce19840c49d, 4db1fecba887defbf7228edd7e4f2ab85d0d34bb,
+7e480d1ff90fd64acb17c0458d96fce8ba1942da
+- Full description: The Android M permission model will request for permissions at 
+run time. To add this support, the activity and Cordova plugins will need to add 
+permission request functions in Android API 23 to handle the runtime permissions. 
+
 Destroy Cordova Webview when onDestroyed() is called
 - Cordova RTC work item number: 101382
 - Apache Cordova Jira issue: 
