@@ -1,4 +1,18 @@
+Revert cordova.js to use 3.6.4 compatible version
+
+- Cordova RTC work item number: 113523
+- Apache Cordova Jira issue: 
+- Markmail or Google Group reference:
+- Product PMR: APAR PI75252 (RTC 113523)
+- Cherry-pick: 
+- Full description: Previously cordova.js was updated to the latest snapshot for 
+APAR 84893. This caused issues and printed weird errors on app startup because 
+this version of the file was not compatible with 3.6.4 version of cordova-android. 
+That version of cordova.js was created using the 5.0.0 Cordova Tools. Reverting 
+cordova.js back to its original file compatible with 3.6.4 resolves the issue. 
+
 Add Android M permission support to Cordova
+
 - Cordova RTC work item number: 106363
 - Apache Cordova Jira issue: 
 - Markmail or Google Group reference:
@@ -13,6 +27,7 @@ run time. To add this support, the activity and Cordova plugins will need to add
 permission request functions in Android API 23 to handle the runtime permissions. 
 
 Destroy Cordova Webview when onDestroyed() is called
+
 - Cordova RTC work item number: 101382
 - Apache Cordova Jira issue: 
 - Markmail or Google Group reference:
